@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Archivo:wght@600;800&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap">
 <style>
 /* Layout: a sticky 3D stage where scrolling walks you up a winding path toward the cross,
-   one floating step card per stop, storm clouds and rays of light around a road of light; a flat overview list below; each step's study unrolls as a scroll. */
+   one floating step card per stop, weekly passage studies, storm clouds and rays of light around a road of light; a flat overview list below; each step's study unrolls as a scroll. */
 :root {
   --parch: #f6ecd6;
   --parch-2: #ecdcb8;
@@ -212,36 +212,43 @@ a { color: var(--gold); }
 .rail.away { opacity: 0; pointer-events: none; }
 
 /* Overview */
-/* Weekly reading */
-.reading { max-width: 860px; margin: 0 auto; padding-inline: 16px; padding-block: 72px 8px; display: grid; gap: 16px; }
+/* Weekly reading: study cards */
+.reading { max-width: 900px; margin: 0 auto; padding-inline: 16px; padding-block: 72px 8px; display: grid; gap: 16px; }
 .reading h2 { font-family: var(--f-display); font-weight: 600; font-size: clamp(2rem, 5vw, 2.8rem); color: var(--title); margin: 0; text-align: center; line-height: 1.1; }
-.rd-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
-@media (max-width: 600px) { .rd-grid { grid-template-columns: minmax(0, 1fr); } }
-.rd-card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 18px 20px; display: grid; gap: 10px; align-content: start; min-width: 0; }
-.rd-card.wide { grid-column: 1 / -1; }
-.rd-card h3 { margin: 0; font-family: var(--f-label); font-weight: 800; text-transform: uppercase; letter-spacing: 0.02em; font-size: 1.15rem; color: var(--title); }
-.rd-card .pace { margin: -6px 0 0; font-style: italic; color: var(--muted); }
-.days { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(165px, 1fr)); gap: 8px; }
-.day { display: flex; align-items: center; gap: 10px; border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; background: var(--parch); }
-.day.read { border-color: var(--gold); }
-.day input { width: 20px; height: 20px; accent-color: var(--gold); flex: none; margin: 0; }
-.day label { flex: 1; min-width: 0; cursor: pointer; display: grid; line-height: 1.2; }
-.day label small { font-family: var(--f-label); font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
-.day label b { white-space: nowrap; }
-.day.read label b { text-decoration: line-through; text-decoration-color: var(--gold); }
-.day a, .rd-card a.read-link { font-family: var(--f-label); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 600; color: var(--gold); text-decoration: none; }
-.stepper { display: flex; align-items: center; gap: 14px; }
-.stepper-lbl { margin: 0 0 -4px; font-family: var(--f-label); font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
-.stepper button {
-  width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--line); background: var(--parch); cursor: pointer;
-  font-size: 1.3rem; line-height: 1; color: var(--title);
+.reading .lead { text-align: center; margin: 0 auto; max-width: 52ch; color: var(--muted); }
+.st-group { display: grid; gap: 10px; }
+.st-group h3 { margin: 8px 0 0; font-family: var(--f-label); font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold); display: flex; align-items: center; gap: 10px; }
+.st-group h3::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+.st-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr)); gap: 12px; }
+.st-card {
+  display: grid; gap: 6px; align-content: start; text-align: left; cursor: pointer; min-width: 0;
+  background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 16px 16px 14px; box-shadow: 0 6px 18px rgba(90, 64, 20, 0.08);
+  transition: transform 0.15s, border-color 0.15s;
 }
-.stepper button:disabled { opacity: 0.35; cursor: default; }
-.stepper .at { font-size: 1.05rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
-.stepper .at b { font-family: var(--f-label); font-size: 1.4rem; color: var(--title); }
-.bar { height: 6px; border-radius: 3px; background: var(--parch-2); overflow: hidden; }
-.bar i { display: block; height: 100%; background: var(--gold); border-radius: 3px; }
-.blessing { margin: 6px 0 0; text-align: center; font-family: var(--f-display); font-style: italic; font-weight: 500; font-size: clamp(1.5rem, 4vw, 2.1rem); color: var(--title); text-wrap: balance; }
+.st-card:hover { border-color: var(--gold); transform: translateY(-2px); }
+.st-card .ref { font-family: var(--f-label); font-weight: 800; text-transform: uppercase; font-size: 1.05rem; color: var(--title); letter-spacing: 0.02em; }
+.st-card .theme { font-style: italic; color: var(--muted); line-height: 1.35; font-size: 1rem; }
+.st-card .meta { display: flex; justify-content: space-between; gap: 8px; margin-top: 6px; font-family: var(--f-label); font-size: 0.66rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.st-card .meta .go { color: var(--gold); font-weight: 600; }
+.st-card .bar { height: 4px; border-radius: 2px; background: var(--parch-2); overflow: hidden; }
+.st-card .bar i { display: block; height: 100%; background: var(--gold); }
+.st-card.add { border-style: dashed; background: transparent; box-shadow: none; align-content: center; justify-items: center; text-align: center; color: var(--gold); min-height: 120px; }
+.st-card.add .ref { color: var(--gold); }
+form.add-passage { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: center; }
+form.add-passage input { flex: 1 1 200px; min-width: 0; max-width: 320px; border: 1px solid var(--line); background: var(--card); border-radius: 999px; padding: 8px 14px; }
+.blessing { margin: 10px 0 0; text-align: center; font-family: var(--f-display); font-style: italic; font-weight: 500; font-size: clamp(1.5rem, 4vw, 2.1rem); color: var(--title); text-wrap: balance; }
+.qa { display: grid; gap: 6px; padding: 12px 0; border-bottom: 1px dashed var(--line); }
+.qa .q { font-weight: 500; color: var(--title); display: flex; gap: 10px; }
+.qa .q .n { font-family: var(--f-label); font-weight: 800; color: var(--gold); flex: none; }
+.qa textarea, .study-notes {
+  width: 100%; min-height: 80px; resize: vertical; border: 1px solid var(--line); background: var(--card); border-radius: 8px; padding: 8px 10px; font-size: 1rem;
+}
+.qa .row { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.saved { font-family: var(--f-label); font-size: 0.66rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gold); min-height: 1em; }
+.num svg { width: 26px; height: 26px; }
+.qa .del { background: none; border: 0; color: var(--muted); cursor: pointer; font-size: 0.8rem; font-family: var(--f-label); padding: 2px 4px; }
+.qa .del.armed { color: var(--danger); font-weight: 600; }
+.qa .mine-tag { font-family: var(--f-label); font-size: 0.62rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
 .overview { max-width: 760px; margin: 0 auto; padding-inline: 16px; padding-block: 72px 40px; display: grid; gap: 18px; }
 .overview h2 { font-family: var(--f-display); font-weight: 600; font-size: clamp(2rem, 5vw, 2.8rem); color: var(--title); margin: 0; text-align: center; line-height: 1.1; text-wrap: balance; }
 .overview .lead { text-align: center; margin: 0 auto; max-width: 56ch; color: var(--muted); }
@@ -372,9 +379,9 @@ form.add .err { color: var(--danger); font-size: 0.9rem; }
 <section class="reading" id="leeswerk" aria-labelledby="rdTitle">
   <div class="ornament" aria-hidden="true">✝</div>
   <h2 id="rdTitle">Week se leeswerk</h2>
-  <p class="progress" id="rdProgress"></p>
-  <div class="rd-grid" id="rdGrid"></div>
-  <p class="blessing" id="rdBlessing"></p>
+  <p class="lead">Tap a passage to see what it says, read its key verses, and answer questions about it. Your answers save as you type.</p>
+  <div id="studyGroups"></div>
+  <p class="blessing">May grace and shalom be ours in full measure</p>
 </section>
 
 <section class="overview" id="overview">
@@ -521,22 +528,103 @@ form.add .err { color: var(--danger); font-size: 0.9rem; }
   const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 
   // ---------- saved study ----------
-  // This week's reading. Change it here each week; a new id starts the ticks afresh.
-  const READING = {
-    id: "spreuke-3-9",
-    daily: { book: "Spreuke", en: "Proverbs", from: 3, to: 9 },
-    ownPace: [
-      { book: "Genesis", en: "Genesis", start: 1, chapters: 50 },
-      { book: "Johannes", en: "John", start: 1, chapters: 21 }
-    ],
-    blessing: "May grace and shalom be ours in full measure"
+  // This week's reading. Each passage opens as a study: what it says, key verses (KJV) and questions.
+  const STUDY_GROUPS = [
+    { title: "Spreuke 3 – 9", ids: ["pro3", "pro4", "pro5", "pro6", "pro7", "pro8", "pro9"] },
+    { title: "Genesis 1 & Johannes 1 · op eie tyd verder", ids: ["gen1", "jhn1"] }
+  ];
+  const PASSAGES = {
+    pro3: { ref: "Spreuke 3", en: "Proverbs 3", theme: "Trust the LORD with all your heart",
+      says: "A father urges his son to hold on to God's teaching and to mercy and truth. He calls him to trust the LORD completely rather than his own understanding, to honour God with his wealth, and to accept God's correction as a sign of love. Wisdom is worth more than silver or gold; it brings long life, peace and safe sleep. The chapter ends with practical wisdom: do good to your neighbour when you can, and do not quarrel or envy the violent.",
+      verses: [["Proverbs 3:5–6", "Trust in the LORD with all thine heart; and lean not unto thine own understanding. In all thy ways acknowledge him, and he shall direct thy paths."],
+               ["Proverbs 3:11–12", "My son, despise not the chastening of the LORD; neither be weary of his correction: for whom the LORD loveth he correcteth; even as a father the son in whom he delighteth."]],
+      questions: ["Where am I leaning on my own understanding instead of trusting God?",
+                  "What would it look like to acknowledge Him “in all thy ways” this week?",
+                  "How have I responded when God has corrected me?",
+                  "Verse 27 says not to withhold good when it is in my power to do it. Who could I do good to this week?"] },
+    pro4: { ref: "Spreuke 4", en: "Proverbs 4", theme: "Guard your heart",
+      says: "A father passes on what his own father taught him: get wisdom, whatever it costs. He sets two roads side by side. The path of the righteous grows brighter like the dawn, while the way of the wicked is deep darkness where people stumble without knowing why. He ends by telling his son to guard his heart, his mouth, his eyes and his feet.",
+      verses: [["Proverbs 4:7", "Wisdom is the principal thing; therefore get wisdom: and with all thy getting get understanding."],
+               ["Proverbs 4:18", "But the path of the just is as the shining light, that shineth more and more unto the perfect day."],
+               ["Proverbs 4:23", "Keep thy heart with all diligence; for out of it are the issues of life."]],
+      questions: ["What spiritual lessons were passed down to me, and what do I want to pass on?",
+                  "What am I letting into my heart that I need to guard against?",
+                  "Verse 26 says to ponder the path of my feet. Where is my path leading right now?",
+                  "What would getting wisdom “with all thy getting” cost me in practice?"] },
+    pro5: { ref: "Spreuke 5", en: "Proverbs 5", theme: "Sweet at first, bitter at the end",
+      says: "The father warns against the adulterous woman. Her words drip like honey and are smoother than oil, but in the end she is bitter as wormwood and her way leads to death. Keep far from her door, or you will lose your strength, your years and your honour, and regret it too late. Instead, find joy in your own wife. God sees every path, and a person's own sins become the cords that trap him.",
+      verses: [["Proverbs 5:8", "Remove thy way far from her, and come not nigh the door of her house."],
+               ["Proverbs 5:18", "Let thy fountain be blessed: and rejoice with the wife of thy youth."],
+               ["Proverbs 5:21", "For the ways of man are before the eyes of the LORD, and he pondereth all his goings."]],
+      questions: ["Which temptations in my life look sweet at first but end bitter?",
+                  "What “doors” do I need to stay well away from?",
+                  "How can I protect and celebrate faithfulness in my relationships?",
+                  "How does knowing that God sees all my ways change how I live?"] },
+    pro6: { ref: "Spreuke 6", en: "Proverbs 6", theme: "Go to the ant",
+      says: "A chapter of practical warnings. If you have rashly guaranteed someone's debt, go and humble yourself to get free. Learn from the ant, which works without a boss and stores food in summer, because laziness brings poverty. Beware of the troublemaker who stirs up strife. The LORD hates seven things, from a proud look to sowing discord among brothers. The chapter returns to the danger of adultery, which burns like fire held in your lap.",
+      verses: [["Proverbs 6:6", "Go to the ant, thou sluggard; consider her ways, and be wise."],
+               ["Proverbs 6:16–19", "These six things doth the LORD hate: yea, seven are an abomination unto him: a proud look, a lying tongue, and hands that shed innocent blood, an heart that deviseth wicked imaginations, feet that be swift in running to mischief, a false witness that speaketh lies, and he that soweth discord among brethren."]],
+      questions: ["What can I learn from the ant about diligence and planning ahead?",
+                  "What have I been putting off that I need to do?",
+                  "Which of the seven things in verses 16–19 do I need to bring to God?",
+                  "Have I made a promise or commitment that I need to put right (verses 1–5)?"] },
+    pro7: { ref: "Spreuke 7", en: "Proverbs 7", theme: "As an ox to the slaughter",
+      says: "The father tells a story. From his window he watches a young man with no sense walk at twilight toward the street where an adulterous woman lives. She meets him, kisses him and flatters him: her husband is away, come and enjoy yourself. He follows her straight away, like an ox going to the slaughter, not knowing it will cost his life. The lesson is to keep God's commands as the apple of your eye and not let your heart turn aside.",
+      verses: [["Proverbs 7:2", "Keep my commandments, and live; and my law as the apple of thine eye."],
+               ["Proverbs 7:4", "Say unto wisdom, Thou art my sister; and call understanding thy kinswoman."],
+               ["Proverbs 7:22", "He goeth after her straightway, as an ox goeth to the slaughter."]],
+      questions: ["The young man was already walking near her corner (verse 8). Where do I drift close to temptation?",
+                  "Why are flattery and smooth words so persuasive, and how do I recognise them?",
+                  "What would it mean to treat God's word as “the apple of thine eye”?",
+                  "What does calling wisdom my “sister” look like in everyday life?"] },
+    pro8: { ref: "Spreuke 8", en: "Proverbs 8", theme: "Wisdom calls out",
+      says: "Wisdom is pictured as a woman calling out in public places: at the gates, the crossroads and the city entrance. Her words are true and right, and worth more than rubies. By her kings rule and judges decide justly. She was with the LORD before the world began, beside Him as He set the heavens in place and marked out the foundations of the earth, rejoicing in His creation. Whoever finds her finds life and favour from the LORD.",
+      verses: [["Proverbs 8:11", "For wisdom is better than rubies; and all the things that may be desired are not to be compared to it."],
+               ["Proverbs 8:17", "I love them that love me; and those that seek me early shall find me."],
+               ["Proverbs 8:35", "For whoso findeth me findeth life, and shall obtain favour of the LORD."]],
+      questions: ["Wisdom calls out in busy public places (verses 1–3). Where do I hear God's wisdom calling in my daily life?",
+                  "What do I actually value more than wisdom, judging by how I spend my time?",
+                  "Verses 22–31 describe creation. What links do you see with Genesis 1 and John 1?",
+                  "What would it look like for me to “seek early”?"] },
+    pro9: { ref: "Spreuke 9", en: "Proverbs 9", theme: "Two invitations",
+      says: "Two women prepare two invitations. Wisdom has built her house with seven pillars, set her table and sends her servants to call the simple: come, eat, leave foolishness behind and live. Folly is loud and knows nothing; she sits at her door calling the same passers-by, saying stolen water is sweet. But her guests end up in the depths of the grave. In between, the chapter says a wise person welcomes correction, and that the fear of the LORD is the beginning of wisdom.",
+      verses: [["Proverbs 9:10", "The fear of the LORD is the beginning of wisdom: and the knowledge of the holy is understanding."],
+               ["Proverbs 9:8", "Reprove not a scorner, lest he hate thee: rebuke a wise man, and he will love thee."],
+               ["Proverbs 9:17", "Stolen waters are sweet, and bread eaten in secret is pleasant."]],
+      questions: ["Wisdom and Folly call the same people with almost the same words (verses 4 and 16). How can I tell which voice I am listening to?",
+                  "How do I usually respond when someone corrects me?",
+                  "What does “the fear of the LORD” mean to me?",
+                  "Why do “stolen waters” taste sweet, and what do they really cost?"] },
+    gen1: { ref: "Genesis 1", en: "Genesis 1", theme: "In the beginning God created",
+      says: "In the beginning God creates the heavens and the earth. Over six days He speaks and it is done: light; the sky; dry land, seas and plants; the sun, moon and stars; fish and birds; and land animals. Last of all He makes humankind, male and female, in His own image, blesses them, and gives them the care of the earth. God sees everything He has made, and it is very good.",
+      verses: [["Genesis 1:1", "In the beginning God created the heaven and the earth."],
+               ["Genesis 1:3", "And God said, Let there be light: and there was light."],
+               ["Genesis 1:27", "So God created man in his own image, in the image of God created he him; male and female created he them."],
+               ["Genesis 1:31", "And God saw every thing that he had made, and, behold, it was very good."]],
+      questions: ["What does Genesis 1 show me about who God is?",
+                  "What does it mean for me to be made in God's image?",
+                  "God created by speaking. What does that say about the power of His word?",
+                  "How should “very good” shape the way I see creation and other people?",
+                  "Compare Genesis 1:1–3 with John 1:1–5. What do you notice?"] },
+    jhn1: { ref: "Johannes 1", en: "John 1", theme: "The Word became flesh",
+      says: "John begins where Genesis begins: in the beginning was the Word, who was with God and was God. Everything was made through Him, and He is the light that shines in the darkness. John the Baptist comes as a witness to that light. The Word becomes flesh and lives among us, full of grace and truth. John points to Jesus as the Lamb of God who takes away the sin of the world, and the first disciples (Andrew, Simon Peter, Philip and Nathanael) are invited to “come and see”.",
+      verses: [["John 1:1", "In the beginning was the Word, and the Word was with God, and the Word was God."],
+               ["John 1:5", "And the light shineth in darkness; and the darkness comprehended it not."],
+               ["John 1:14", "And the Word was made flesh, and dwelt among us, (and we beheld his glory, the glory as of the only begotten of the Father,) full of grace and truth."],
+               ["John 1:29", "Behold the Lamb of God, which taketh away the sin of the world."]],
+      questions: ["Why do you think John calls Jesus “the Word”?",
+                  "What does it mean to me that the Word “became flesh and dwelt among us”?",
+                  "Where do I need His light to shine into a dark place in my life?",
+                  "John the Baptist pointed away from himself to Jesus. How can I do the same?",
+                  "Jesus asks, “What seek ye?” (verse 38). How would I answer Him today?",
+                  "Philip said “Come and see” (verse 46). Who could I invite?"] }
   };
-  const readUrl = (en, ch) => `https://www.biblegateway.com/passage/?search=${encodeURIComponent(en + " " + ch)}&version=AFR53`;
+  const readUrl = q => `https://www.biblegateway.com/passage/?search=${encodeURIComponent(q)}&version=AFR53`;
 
   let data = { learned: {}, verses: {}, notes: {} };
   try {
     const raw = JSON.parse(localStorage.getItem(STORE) || "null");
-    if (raw && typeof raw === "object") data = { learned: raw.learned || {}, verses: raw.verses || {}, notes: raw.notes || {}, reading: raw.reading };
+    if (raw && typeof raw === "object") data = { learned: raw.learned || {}, verses: raw.verses || {}, notes: raw.notes || {}, study: raw.study };
   } catch (e) { /* start fresh */ }
   const save = () => { try { localStorage.setItem(STORE, JSON.stringify(data)); } catch (e) { /* storage unavailable */ } };
   const myVerses = i => (data.verses[i] = Array.isArray(data.verses[i]) ? data.verses[i] : []);
@@ -551,63 +639,158 @@ form.add .err { color: var(--danger); font-size: 0.9rem; }
   if (framed) $("timelineLink").hidden = true;
 
   // ---------- overview ----------
-  function readingState() {
-    let r = data.reading;
-    if (!r || typeof r !== "object") r = {};
-    if (r.id !== READING.id) r = { id: READING.id, done: {}, at: r.at || {} };
-    r.done = r.done || {}; r.at = r.at || {};
-    READING.ownPace.forEach(b => { if (!Number.isInteger(r.at[b.book])) r.at[b.book] = b.start; });
-    return (data.reading = r);
+  // ---------- passage studies ----------
+  function studyState() {
+    const st = data.study && typeof data.study === "object" ? data.study : {};
+    st.answers = st.answers || {}; st.extraQ = st.extraQ || {}; st.notes = st.notes || {};
+    st.custom = Array.isArray(st.custom) ? st.custom : [];
+    return (data.study = st);
   }
-  function renderReading() {
-    const r = readingState(), d = READING.daily;
-    const chs = []; for (let c = d.from; c <= d.to; c++) chs.push(c);
-    const done = chs.filter(c => r.done[c]).length;
-    $("rdProgress").textContent = `${done} van ${chs.length} hoofstukke van ${d.book} gelees`;
-    $("rdGrid").innerHTML = `
-      <div class="rd-card wide">
-        <h3>${esc(d.book)} ${d.from} – ${d.to}</h3>
-        <p class="pace">Een hoofstuk per dag</p>
-        <div class="bar" aria-hidden="true"><i style="width:${(done / chs.length * 100).toFixed(0)}%"></i></div>
-        <ul class="days">${chs.map((c, n) => `<li class="day${r.done[c] ? " read" : ""}">
-          <input type="checkbox" id="rd-${c}" data-ch="${c}"${r.done[c] ? " checked" : ""}>
-          <label for="rd-${c}"><small>Dag ${n + 1}</small><b>${esc(d.book)} ${c}</b></label>
-          <a href="${readUrl(d.en, c)}" target="_blank" rel="noopener" aria-label="Lees ${esc(d.book)} ${c}">Lees</a></li>`).join("")}</ul>
+  function passage(id) {
+    if (PASSAGES[id]) return { id, ...PASSAGES[id] };
+    const c = studyState().custom.find(x => x.id === id);
+    return c ? { id, ref: c.ref, en: c.ref, theme: "", says: "", verses: [], questions: [], custom: true } : null;
+  }
+  function questionsOf(p) {
+    const st = studyState();
+    return p.questions.map((q, n) => ({ id: "q" + n, q, mine: false }))
+      .concat((st.extraQ[p.id] || []).map(x => ({ id: x.id, q: x.q, mine: true })));
+  }
+  function answeredCount(p) {
+    const a = studyState().answers[p.id] || {};
+    return questionsOf(p).filter(q => (a[q.id] || "").trim()).length;
+  }
+  const allIds = () => STUDY_GROUPS.flatMap(g => g.ids).concat(studyState().custom.map(c => c.id));
+
+  function renderStudies() {
+    const st = studyState();
+    const card = p => {
+      const total = questionsOf(p).length, done = answeredCount(p);
+      return `<button type="button" class="st-card" data-study="${esc(p.id)}">
+        <span class="ref">${esc(p.ref)}</span>
+        ${p.theme ? `<span class="theme">${esc(p.theme)}</span>` : `<span class="theme">Your own study</span>`}
+        <span class="bar" aria-hidden="true"><i style="width:${total ? (done / total * 100).toFixed(0) : 0}%"></i></span>
+        <span class="meta"><span>${total ? `${done} of ${total} answered` : "Add questions"}</span><span class="go">Open →</span></span>
+      </button>`;
+    };
+    $("studyGroups").innerHTML = STUDY_GROUPS.map(g => `<div class="st-group"><h3>${esc(g.title)}</h3>
+        <div class="st-grid">${g.ids.map(id => card(passage(id))).join("")}</div></div>`).join("") +
+      `<div class="st-group"><h3>My passages</h3><div class="st-grid">
+        ${st.custom.map(c => card(passage(c.id))).join("")}
+        <button type="button" class="st-card add" data-act-add aria-expanded="false"><span class="ref">+ Add a passage</span><span class="theme">Carry on with Genesis 2, Johannes 2…</span></button>
       </div>
-      ${READING.ownPace.map(b => {
-        const at = r.at[b.book];
-        return `<div class="rd-card">
-          <h3>${esc(b.book)} ${b.start}</h3>
-          <p class="pace">Op eie tyd verder</p>
-          <p class="stepper-lbl">Waar ek nou is</p>
-          <div class="stepper">
-            <button type="button" data-book="${esc(b.book)}" data-d="-1" aria-label="Vorige hoofstuk"${at <= 1 ? " disabled" : ""}>−</button>
-            <span class="at">Hoofstuk <b>${at}</b> van ${b.chapters}</span>
-            <button type="button" data-book="${esc(b.book)}" data-d="1" aria-label="Volgende hoofstuk"${at >= b.chapters ? " disabled" : ""}>+</button>
-          </div>
-          <div class="bar" aria-hidden="true"><i style="width:${(at / b.chapters * 100).toFixed(0)}%"></i></div>
-          <a class="read-link" href="${readUrl(b.en, at)}" target="_blank" rel="noopener">Lees ${esc(b.book)} ${at} →</a>
-        </div>`;
-      }).join("")}`;
-    $("rdBlessing").textContent = READING.blessing;
+      <form class="add-passage" id="addPassage" hidden novalidate>
+        <input type="text" id="newRef" maxlength="60" placeholder="e.g. Genesis 2" aria-label="Passage to add">
+        <button class="btn primary" type="submit">Add passage</button>
+        <span class="saved" id="addErr" role="alert"></span>
+      </form></div>`;
   }
-  $("rdGrid").addEventListener("change", e => {
-    const c = e.target.dataset.ch;
-    if (!c) return;
-    const r = readingState();
-    r.done[c] = e.target.checked;
-    save(); renderReading();
-    $("rd-" + c).focus();
-    if (e.target.checked) toast("Gelees ✓");
+  $("studyGroups").addEventListener("click", e => {
+    const c = e.target.closest("[data-study]");
+    if (c) { openStudy(c.dataset.study); return; }
+    if (e.target.closest("[data-act-add]")) {
+      const f = $("addPassage"); f.hidden = !f.hidden;
+      e.target.closest("[data-act-add]").setAttribute("aria-expanded", String(!f.hidden));
+      if (!f.hidden) $("newRef").focus();
+    }
   });
-  $("rdGrid").addEventListener("click", e => {
-    const b = e.target.closest("[data-book]");
+  $("studyGroups").addEventListener("submit", e => {
+    e.preventDefault();
+    const ref = $("newRef").value.trim();
+    if (!ref) { $("addErr").textContent = "Type a passage, like Genesis 2."; return; }
+    const id = "c" + uid();
+    studyState().custom.push({ id, ref });
+    save(); renderStudies(); openStudy(id); toast("Passage added");
+  });
+
+  let openStudyId = null, saveT = 0;
+  function openStudy(id) {
+    const p = passage(id);
+    if (!p) return;
+    openStep = null; openStudyId = id;
+    const st = studyState(), ans = st.answers[id] || {}, qs = questionsOf(p);
+    const ids = allIds(), at = ids.indexOf(id);
+    $("paper").innerHTML = `
+      <div class="sheet-h">
+        <span class="num" aria-hidden="true">${ICONS.book}</span>
+        <div><div class="kicker">Week se leeswerk</div><h2 id="sheetTitle">${esc(p.ref)}</h2>${p.theme ? `<div style="font-style:italic">${esc(p.theme)}</div>` : ""}</div>
+        <button type="button" class="x" data-act="close" aria-label="Close">×</button>
+      </div>
+      <div class="sheet-b">
+        <h4>What it says</h4>
+        ${p.says ? `<p class="lesson">${esc(p.says)}</p>` : `<p class="empty">Read the passage, then sum it up in your own words in “My notes” below.</p>`}
+        <p style="margin:4px 0 0"><a href="${readUrl(p.en)}" target="_blank" rel="noopener">Read ${esc(p.ref)} in full (Afrikaans 1933/53) →</a></p>
+        ${p.verses.length ? `<h4>Key verses</h4>${p.verses.map(([r, t]) => `<blockquote class="scripture"><p>“${esc(t)}”</p><cite>${esc(r)} · KJV</cite></blockquote>`).join("")}` : ""}
+        <h4>Questions to think about</h4>
+        ${qs.length ? qs.map((q, n) => `<div class="qa">
+            <div class="q"><span class="n">${n + 1}.</span><span>${esc(q.q)}</span></div>
+            <label class="mine-tag" for="ans-${esc(q.id)}">Your answer${q.mine ? " · your own question" : ""}</label>
+            <textarea id="ans-${esc(q.id)}" data-q="${esc(q.id)}" maxlength="6000" placeholder="Write your answer…">${esc(ans[q.id] || "")}</textarea>
+            <div class="row"><span class="saved" data-saved="${esc(q.id)}"></span>${q.mine ? `<button type="button" class="del" data-act="delQ" data-id="${esc(q.id)}">Remove question</button>` : ""}</div>
+          </div>`).join("") : `<p class="empty">No questions yet. Add your own below.</p>`}
+        <form class="add" id="qForm" novalidate>
+          <input type="text" id="newQ" maxlength="400" placeholder="Add your own question" aria-label="Your own question">
+          <div class="row"><button class="btn" type="submit">Add question</button><span class="err" id="qErr" role="alert"></span></div>
+        </form>
+        <h4>My notes</h4>
+        <textarea class="study-notes" id="studyNotes" data-notes maxlength="10000" placeholder="Anything else that stood out to you">${esc(st.notes[id] || "")}</textarea>
+        <span class="saved" data-saved="notes"></span>
+        <div class="sheet-f">
+          <span style="display:flex;gap:8px;flex-wrap:wrap">
+            ${at > 0 ? `<button type="button" class="btn" data-act="sprev">← ${esc(passage(ids[at - 1]).ref)}</button>` : ""}
+            ${at < ids.length - 1 ? `<button type="button" class="btn" data-act="snext">${esc(passage(ids[at + 1]).ref)} →</button>` : ""}
+          </span>
+          ${p.custom ? `<button type="button" class="btn danger" data-act="delPassage">Remove passage</button>` : ""}
+        </div>
+      </div>`;
+    const sh = $("sheet");
+    if (sh.hidden) { sh.classList.remove("unroll"); void sh.offsetWidth; if (!reduced) sh.classList.add("unroll"); }
+    sh.hidden = false; $("scrim").hidden = false;
+    $("paper").scrollTop = 0;
+    stopWalk();
+    document.body.style.overflow = "hidden";
+    sh.querySelector(".x").focus({ preventScroll: true });
+  }
+  function studyClick(e) {
+    const b = e.target.closest("[data-act]");
     if (!b) return;
-    const r = readingState(), book = READING.ownPace.find(x => x.book === b.dataset.book);
-    r.at[book.book] = clamp(r.at[book.book] + Number(b.dataset.d), 1, book.chapters);
-    save(); renderReading();
-    const again = $("rdGrid").querySelector(`[data-book="${b.dataset.book}"][data-d="${b.dataset.d}"]`);
-    if (again && !again.disabled) again.focus();
+    const id = openStudyId, act = b.dataset.act, ids = allIds(), at = ids.indexOf(id);
+    if (act === "close") closeSheet();
+    else if (act === "sprev") openStudy(ids[at - 1]);
+    else if (act === "snext") openStudy(ids[at + 1]);
+    else if (act === "delQ") arm(b, "Tap to confirm", () => {
+      const st = studyState();
+      st.extraQ[id] = (st.extraQ[id] || []).filter(x => x.id !== b.dataset.id);
+      if (st.answers[id]) delete st.answers[id][b.dataset.id];
+      save(); openStudy(id); toast("Question removed");
+    });
+    else if (act === "delPassage") arm(b, "Tap again to remove", () => {
+      const st = studyState();
+      st.custom = st.custom.filter(c => c.id !== id);
+      delete st.answers[id]; delete st.extraQ[id]; delete st.notes[id];
+      save(); closeSheet(); toast("Passage removed");
+    });
+  }
+  function studySubmit(e) {
+    if (e.target.id !== "qForm") return;
+    const q = $("newQ").value.trim();
+    if (!q) { $("qErr").textContent = "Type a question first."; return; }
+    const st = studyState();
+    (st.extraQ[openStudyId] = st.extraQ[openStudyId] || []).push({ id: "m" + uid(), q });
+    save(); openStudy(openStudyId); toast("Question added");
+  }
+  // answers and notes save as you type
+  $("paper").addEventListener("input", e => {
+    if (openStudyId === null) return;
+    const st = studyState(), t = e.target;
+    let key;
+    if (t.dataset.q) { (st.answers[openStudyId] = st.answers[openStudyId] || {})[t.dataset.q] = t.value; key = t.dataset.q; }
+    else if (t.dataset.notes !== undefined) { st.notes[openStudyId] = t.value; key = "notes"; }
+    else return;
+    const tag = $("paper").querySelector(`[data-saved="${CSS.escape(key)}"]`);
+    if (tag) tag.textContent = "Saving…";
+    clearTimeout(saveT);
+    saveT = setTimeout(() => { save(); if (tag && tag.isConnected) tag.textContent = "Saved"; }, 400);
   });
 
   function renderOverview() {
@@ -868,6 +1051,7 @@ form.add .err { color: var(--danger); font-size: 0.9rem; }
   // ---------- study sheet ----------
   let openStep = null;
   function openSheet(i) {
+    openStudyId = null;
     openStep = i;
     const s = STEPS[i];
     const mv = myVerses(i), mn = myNotes(i);
@@ -921,8 +1105,11 @@ form.add .err { color: var(--danger); font-size: 0.9rem; }
   function closeSheet() {
     $("sheet").hidden = true; $("scrim").hidden = true;
     document.body.style.overflow = "";
-    const back = document.querySelector(`.card[data-step="${openStep}"]`);
-    openStep = null;
+    clearTimeout(saveT); save();
+    const back = openStudyId !== null
+      ? (renderStudies(), document.querySelector(`.st-card[data-study="${CSS.escape(openStudyId)}"]`))
+      : document.querySelector(`.card[data-step="${openStep}"]`);
+    openStep = null; openStudyId = null;
     if (back && back.style.visibility !== "hidden") back.focus({ preventScroll: true });
   }
   function changed() { save(); renderOverview(); renderRail(); refreshCardMeta(); update(); }
@@ -936,6 +1123,7 @@ form.add .err { color: var(--danger); font-size: 0.9rem; }
   }
 
   $("sheet").addEventListener("click", e => {
+    if (openStudyId !== null) return studyClick(e);
     const b = e.target.closest("[data-act]");
     if (!b || openStep === null) return;
     const i = openStep, act = b.dataset.act;
@@ -948,6 +1136,7 @@ form.add .err { color: var(--danger); font-size: 0.9rem; }
   });
   $("sheet").addEventListener("submit", e => {
     e.preventDefault();
+    if (openStudyId !== null) return studySubmit(e);
     const i = openStep;
     if (e.target.id === "verseForm") {
       const ref = $("vRef").value.trim(), text = $("vText").value.trim();
@@ -972,7 +1161,7 @@ form.add .err { color: var(--danger); font-size: 0.9rem; }
 
   // ---------- boot ----------
   renderOverview();
-  renderReading();
+  renderStudies();
   if (!reduced) {
     buildWorld();
     renderRail();
@@ -981,7 +1170,10 @@ form.add .err { color: var(--danger); font-size: 0.9rem; }
     layout();
     // one animation loop: scroll position drives the walk, time drives the drifting clouds
     const frame = () => {
-      if (!document.hidden && window.scrollY < journeyTop() + $("journey").offsetHeight) update();
+      if (!document.hidden) {
+        if (window.scrollY < journeyTop() + $("journey").offsetHeight) update();
+        else { $("rail").classList.add("away"); $("walkBtn").classList.add("away"); }
+      }
       requestAnimationFrame(frame);
     };
     requestAnimationFrame(frame);
