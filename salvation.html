@@ -10,11 +10,35 @@
 <style>
 /* Layout: a sticky 3D stage where scrolling walks you up a winding path toward the cross,
    one floating step card per stop, weekly passage studies, storm clouds and rays of light around a road of light; a flat overview list below; each step's study unrolls as a scroll. */
+/* One look for the whole page: the sunlit cloud sky. It does not switch with light or dark mode. */
 :root {
-  --parch: #f6ecd6;
-  --parch-2: #ecdcb8;
-  --sky-top: #fdf7ea;
-  --sky-bot: #efdcb2;
+  --parch: #121117;
+  --parch-2: rgba(255, 240, 215, 0.14);
+  --card: rgba(24, 21, 27, 0.66);
+  --card-solid: rgba(26, 23, 30, 0.86);
+  --title: #fbf2df;
+  --ink: #efe6d6;
+  --muted: #cbbda7;
+  --gold: #e9c27a;
+  --gold-soft: rgba(233, 194, 122, 0.5);
+  --line: rgba(255, 236, 205, 0.22);
+  --badge-bg: #e9c27a;
+  --badge-fg: #17151c;
+  --scrim: rgba(6, 6, 10, 0.55);
+  --danger: #f2998a;
+  --shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+  --wood-1: #6e4a26;
+  --wood-2: #a87c4a;
+
+  --f-display: "Cormorant Garamond", "Iowan Old Style", Georgia, serif;
+  --f-label: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --f-body: "EB Garamond", "Iowan Old Style", Georgia, serif;
+  color-scheme: dark;
+}
+/* the unrolled scroll stays light parchment with dark ink */
+.sheet {
+  --parch: #f3e6c8;
+  --parch-2: #e6d3ab;
   --card: #fffaf0;
   --title: #1a2b4c;
   --ink: #2b2a2c;
@@ -24,45 +48,19 @@
   --line: #dcc8a0;
   --badge-bg: #1a2b4c;
   --badge-fg: #ffffff;
-  --path: #e2c995;
-  --path-edge: #c9a868;
-  --foot: #8d6a37;
-  --glow: rgba(255, 214, 140, 0.9);
-  --scrim: rgba(26, 30, 40, 0.45);
   --danger: #9b3a2c;
-  --shadow: 0 18px 40px rgba(90, 64, 20, 0.18);
-  --cloud: #ffffff;
-  --cloud-shade: #ecd6ae;
   --paper: #f7ebcf;
   --paper-edge: #dcc08a;
-  --wood-1: #6e4a26;
-  --wood-2: #a87c4a;
-
-  --f-display: "Cormorant Garamond", "Iowan Old Style", Georgia, serif;
-  --f-label: "Archivo", "Helvetica Neue", Arial, sans-serif;
-  --f-body: "EB Garamond", "Iowan Old Style", Georgia, serif;
+  color: var(--ink);
   color-scheme: light;
 }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --parch: #0e1526; --parch-2: #141d33; --sky-top: #0a1020; --sky-bot: #1d2744; --card: #16203a;
-    --title: #f1e4c4; --ink: #e9e2d2; --muted: #a99c84; --gold: #e0b45e; --gold-soft: #7d6029;
-    --line: #2d3953; --badge-bg: #e0b45e; --badge-fg: #0e1526; --path: #3b3628; --path-edge: #57492c;
-    --foot: #d2aa62; --glow: rgba(255, 196, 110, 0.55); --scrim: rgba(0, 0, 0, 0.6); --danger: #f0907f;
-    --shadow: 0 18px 40px rgba(0, 0, 0, 0.5);
-    --cloud: #4a5578; --cloud-shade: #222b45; --paper: #1c2236; --paper-edge: #0f1324; --wood-1: #4e3420; --wood-2: #7f5a36;
-    color-scheme: dark;
-  }
+/* the cloud photo stays fixed behind every section */
+.backdrop {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background: linear-gradient(rgba(12, 10, 16, 0.5), rgba(12, 10, 16, 0.72)), url("images/heaven-clouds.jpg") 58% 32% / cover no-repeat, #2a2630;
 }
-:root[data-theme="dark"] {
-  --parch: #0e1526; --parch-2: #141d33; --sky-top: #0a1020; --sky-bot: #1d2744; --card: #16203a;
-  --title: #f1e4c4; --ink: #e9e2d2; --muted: #a99c84; --gold: #e0b45e; --gold-soft: #7d6029;
-  --line: #2d3953; --badge-bg: #e0b45e; --badge-fg: #0e1526; --path: #3b3628; --path-edge: #57492c;
-  --foot: #d2aa62; --glow: rgba(255, 196, 110, 0.55); --scrim: rgba(0, 0, 0, 0.6); --danger: #f0907f;
-  --shadow: 0 18px 40px rgba(0, 0, 0, 0.5);
-  --cloud: #4a5578; --cloud-shade: #222b45; --paper: #1c2236; --paper-edge: #0f1324; --wood-1: #4e3420; --wood-2: #7f5a36;
-  color-scheme: dark;
-}
+.journey, .reading, .overview { position: relative; z-index: 1; }
+.reading, .overview { text-shadow: 0 1px 14px rgba(8, 6, 10, 0.55); }
 
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
@@ -124,7 +122,7 @@ a { color: var(--gold); }
 .card {
   --cw: min(400px, 76vw);
   width: var(--cw); text-align: left; cursor: pointer;
-  background: var(--card); border: 1px solid var(--line); border-radius: 14px;
+  background: var(--card-solid); border: 1px solid var(--line); border-radius: 14px;
   padding: 20px 22px 18px; box-shadow: var(--shadow);
   display: grid; grid-template-columns: auto 1fr auto; gap: 4px 14px; align-items: start;
   will-change: transform, opacity;
@@ -221,8 +219,9 @@ a { color: var(--gold); }
 .st-group h3::after { content: ""; flex: 1; height: 1px; background: var(--line); }
 .st-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr)); gap: 12px; }
 .st-card {
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); text-shadow: none;
   display: grid; gap: 6px; align-content: start; text-align: left; cursor: pointer; min-width: 0;
-  background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 16px 16px 14px; box-shadow: 0 6px 18px rgba(90, 64, 20, 0.08);
+  background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 16px 16px 14px; box-shadow: var(--shadow);
   transition: transform 0.15s, border-color 0.15s;
 }
 .st-card:hover { border-color: var(--gold); transform: translateY(-2px); }
@@ -259,7 +258,7 @@ form.add-passage input { flex: 1 1 200px; min-width: 0; max-width: 320px; border
   position: relative; width: 100%; display: grid; grid-template-columns: auto 1fr auto; gap: 16px; align-items: center;
   background: none; border: 1px solid transparent; border-radius: 12px; padding: 12px 12px 12px 0; cursor: pointer; text-align: left;
 }
-.ov-item:hover { border-color: var(--line); background: var(--card); }
+.ov-item:hover { border-color: var(--line); background: var(--card); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
 .ov-item .txt { min-width: 0; }
 .ov-item .meta { display: block; font-family: var(--f-label); font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-top: 4px; }
 .closing { text-align: center; display: grid; gap: 8px; padding-block: 24px 8px; }
@@ -344,6 +343,7 @@ form.add .err { color: var(--danger); font-size: 0.9rem; }
 </style>
 </head>
 <body>
+<div class="backdrop" aria-hidden="true"></div>
 
 <nav class="topbar">
   <a href="#top" id="brand" aria-label="Back to the start">✝ <span class="brand-txt">Pattern of Salvation</span></a>
