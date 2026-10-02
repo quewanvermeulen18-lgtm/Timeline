@@ -4,7 +4,7 @@ An interactive timeline of the Bible, from the undated early chapters of Genesis
 
 ## Use it
 
-Open `index.html` in any browser. To put it online, turn on GitHub Pages under **Settings → Pages** (branch `main`, folder `/ (root)`).
+Open `index.html` (the Pattern of Salvation) or `timeline.html` (the Bible Timeline) in any browser. To put it online, turn on GitHub Pages under **Settings → Pages** (branch `main`, folder `/ (root)`).
 
 ## What it does
 

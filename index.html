@@ -3,807 +3,1184 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Bible Timeline</title>
+<title>The Pattern of Salvation</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Archivo:wght@600;800&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap">
 <style>
-/* Layout: a long horizontal scroll of the centuries (era bands, lanes of events),
-   with a readable chronological list underneath and a side drawer for details and editing. */
-/* Same look as the Pattern of Salvation page: evening sky, gold, glass panels. One look in light and dark mode. */
+/* Layout: a sticky 3D stage where scrolling walks you up a winding path toward the cross,
+   one floating step card per stop, weekly passage studies, storm clouds and rays of light around a road of light; a flat overview list below; each step's study unrolls as a scroll. */
+/* One look for the whole page, matching the cloud walk. It does not switch with light or dark mode. */
 :root {
-  --bg: #1c1a22;
-  --surface: rgba(24, 21, 27, 0.7);
-  --surface-solid: #211e27;
-  --surface-2: rgba(255, 240, 215, 0.06);
-  --field: rgba(255, 240, 215, 0.07);
-  --ink: #efe6d6;
+  --parch: #121117;
+  --parch-2: rgba(255, 240, 215, 0.14);
+  --card: rgba(24, 21, 27, 0.66);
+  --card-solid: rgba(26, 23, 30, 0.86);
   --title: #fbf2df;
+  --ink: #efe6d6;
   --muted: #cbbda7;
-  --line: rgba(255, 236, 205, 0.2);
-  --accent: #e9c27a;
-  --accent-ink: #17151c;
   --gold: #e9c27a;
+  --gold-soft: rgba(233, 194, 122, 0.5);
+  --line: rgba(255, 236, 205, 0.22);
+  --badge-bg: #e9c27a;
+  --badge-fg: #17151c;
+  --scrim: rgba(6, 6, 10, 0.55);
   --danger: #f2998a;
-  --band-a: rgba(233, 194, 122, 0.07);
-  --band-b: rgba(255, 236, 205, 0.03);
   --shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
-
-  --c-era: #e2cfa6;
-  --c-event: #a9bdf2;
-  --c-person: #cfa8ea;
-  --c-reign: #e9c27a;
-  --c-prophet: #82d3c0;
-  --c-writing: #f2998a;
-  --c-history: #b9b4ac;
+  --wood-1: #6e4a26;
+  --wood-2: #a87c4a;
 
   --f-display: "Cormorant Garamond", "Iowan Old Style", Georgia, serif;
+  --f-label: "Archivo", "Helvetica Neue", Arial, sans-serif;
   --f-body: "EB Garamond", "Iowan Old Style", Georgia, serif;
-  --f-mono: "Archivo", "Helvetica Neue", Arial, sans-serif;
   color-scheme: dark;
 }
+/* the unrolled scroll stays light parchment with dark ink */
+.sheet {
+  --parch: #f3e6c8;
+  --parch-2: #e6d3ab;
+  --card: #fffaf0;
+  --title: #1a2b4c;
+  --ink: #2b2a2c;
+  --muted: #6e6350;
+  --gold: #a87a26;
+  --gold-soft: #e2c27e;
+  --line: #dcc8a0;
+  --badge-bg: #1a2b4c;
+  --badge-fg: #ffffff;
+  --danger: #9b3a2c;
+  --paper: #f7ebcf;
+  --paper-edge: #dcc08a;
+  color: var(--ink);
+  color-scheme: light;
+}
+/* below the 3D walk: a plain, soft evening sky (the cloud photo lives only in the walk) */
 .backdrop {
-  position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
   background: linear-gradient(180deg, #1c1a22 0%, #26232e 38%, #352f39 72%, #4a3d36 100%);
 }
-.topbar {
-  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 9; margin-inline: -16px;
-  display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 16px;
-  font-family: var(--f-mono); font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase;
-  background: linear-gradient(rgba(12, 11, 16, 0.85), rgba(12, 11, 16, 0));
-}
-.topbar a { color: #f4e7cc; text-decoration: none; font-weight: 600; white-space: nowrap; }
-.topbar a:hover, .topbar a[aria-current="page"] { color: var(--gold); }
-.topbar .links { display: flex; gap: 18px; }
-@media (max-width: 520px) { .topbar { font-size: 0.68rem; } .topbar .links { gap: 12px; } .brand-txt { display: none; } }
+.journey, .reading, .overview { position: relative; z-index: 1; }
 
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
+html { scroll-snap-type: y proximity; }
 html, body { margin: 0; }
-body {
-  background: var(--bg);
-  color: var(--ink);
-  font: 17px/1.55 var(--f-body);
-  padding-inline: 16px;
-  padding-block: 0 48px;
-}
-.wrap { max-width: 1280px; margin: 0 auto; display: grid; gap: 20px; }
-button, input, select, textarea { font: inherit; color: inherit; }
-:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+body { background: var(--parch); color: var(--ink); font: 18px/1.6 var(--f-body); }
+button, input, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+a { color: var(--gold); }
 
-/* Header */
-header.top {
-  display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 12px 24px;
-  padding-block: 12px 4px;
+/* Top bar */
+.topbar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 30;
+  display: flex; justify-content: space-between; align-items: center; gap: 12px;
+  padding: calc(10px + env(safe-area-inset-top, 0px)) 16px 10px;
+  font-family: var(--f-label); font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase;
+  background: linear-gradient(rgba(12, 11, 16, 0.72), rgba(12, 11, 16, 0));
 }
-h1 {
-  font-family: var(--f-display); font-weight: 600; font-size: clamp(2.3rem, 5vw, 3.4rem); color: var(--title);
-  line-height: 1.05; margin: 0; letter-spacing: 0.01em; text-wrap: balance;
+.topbar a { color: #f4e7cc; text-decoration: none; font-weight: 600; }
+.topbar a:hover { color: #e9c27a; }
+.topbar .links { display: flex; gap: 18px; }
+.topbar a { white-space: nowrap; }
+@media (max-width: 520px) { .topbar { font-size: 0.68rem; } .topbar .links { gap: 12px; } .brand-txt { display: none; } }
+
+/* 3D journey */
+.journey { position: relative; }
+.snap { position: absolute; left: 0; width: 1px; height: 1px; scroll-snap-align: start; }
+.stage {
+  position: sticky; top: 0; height: 100vh; height: 100dvh; overflow: hidden;
+  perspective: 900px; perspective-origin: 50% 45%;
+  /* one fixed look for the heavens, whatever the page theme; shown if the photo cannot load */
+  background: radial-gradient(circle at 58% 32%, #f6e2c6 0, #9a8073 22%, #3a343a 55%, #15151b 100%);
 }
-.ornament { display: flex; align-items: center; gap: 12px; color: var(--gold); margin-bottom: 6px; }
-.ornament::after { content: ""; height: 1px; width: min(120px, 22vw); background: rgba(233, 194, 122, 0.5); }
-h1 em { color: var(--gold); }
-.sub { margin: 6px 0 0; color: var(--muted); max-width: 62ch; }
-.actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.sky-photo {
+  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 58% 32%;
+  transform-origin: 58% 32%; will-change: transform; pointer-events: none; user-select: none;
+}
+.rays {
+  position: absolute; inset: 0; pointer-events: none; mix-blend-mode: screen; transform-origin: 58% 32%;
+  background: repeating-conic-gradient(from 0deg at 58% 32%, rgba(255, 236, 205, 0) 0deg 4deg, rgba(255, 236, 205, 0.2) 6deg, rgba(255, 236, 205, 0) 8.5deg 13deg);
+  -webkit-mask-image: radial-gradient(circle at 58% 32%, #000 0, rgba(0, 0, 0, 0.55) 30%, transparent 70%);
+  mask-image: radial-gradient(circle at 58% 32%, #000 0, rgba(0, 0, 0, 0.55) 30%, transparent 70%);
+  filter: blur(7px);
+}
+.sun {
+  position: absolute; left: 58%; top: 32%; width: 80vmin; height: 80vmin; transform: translate(-50%, -50%);
+  background: radial-gradient(circle, rgba(255, 244, 225, 0.85) 0%, rgba(255, 225, 185, 0.35) 30%, transparent 64%);
+  mix-blend-mode: screen; pointer-events: none;
+}
+.vignette { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse at 55% 40%, transparent 45%, rgba(8, 8, 12, 0.6) 100%); }
+.world { position: absolute; left: 50%; top: 45%; width: 0; height: 0; transform-style: preserve-3d; }
+.world > * { position: absolute; left: 0; top: 0; transform-origin: 0 0; backface-visibility: hidden; }
+.world > .floor { display: block; backface-visibility: visible; }
+.halo { border-radius: 50%; background: radial-gradient(circle, rgba(255, 246, 228, 0.95) 0%, rgba(255, 220, 170, 0.4) 30%, transparent 65%); pointer-events: none; }
+.hill { border-radius: 50%; background: radial-gradient(ellipse at 50% 60%, rgba(255, 232, 196, 0.55) 0%, rgba(255, 220, 180, 0.2) 40%, transparent 70%); pointer-events: none; }
+.cross3d { pointer-events: none; }
+.cross3d svg { width: 100%; height: 100%; display: block; }
+
+.card {
+  --cw: min(400px, 76vw);
+  width: var(--cw); text-align: left; cursor: pointer;
+  background: var(--card-solid); border: 1px solid var(--line); border-radius: 14px;
+  padding: 20px 22px 18px; box-shadow: var(--shadow);
+  display: grid; grid-template-columns: auto 1fr auto; gap: 4px 14px; align-items: start;
+  will-change: transform, opacity;
+}
+.card:hover { border-color: var(--gold); }
+.num {
+  width: 46px; height: 46px; border-radius: 50%; background: var(--badge-bg); color: var(--badge-fg);
+  display: grid; place-items: center; font-family: var(--f-label); font-weight: 800; font-size: 1.3rem;
+  box-shadow: 0 0 0 3px var(--card), 0 0 0 5px var(--gold-soft);
+}
+.card .txt { min-width: 0; }
+.card .h, .ov-item .h {
+  display: block; margin: 2px 0 0; font-family: var(--f-label); font-weight: 800; font-size: 1.2rem; letter-spacing: 0.02em;
+  text-transform: uppercase; color: var(--title); line-height: 1.15;
+}
+.card .sub, .ov-item .sub { display: block; margin: 4px 0 0; font-size: 1.05rem; line-height: 1.35; }
+.ico { width: 54px; height: 54px; color: var(--gold); flex: none; }
+.ico svg { width: 100%; height: 100%; display: block; }
+.card .verse {
+  display: block; grid-column: 1 / -1; margin: 12px 0 0; padding-top: 12px; border-top: 1px solid var(--line);
+  font-style: italic; color: var(--muted); font-size: 0.98rem; line-height: 1.45;
+}
+.card .verse b { font-style: normal; font-weight: 500; color: var(--gold); white-space: nowrap; }
+.card .foot {
+  grid-column: 1 / -1; display: flex; justify-content: space-between; gap: 10px; margin-top: 10px;
+  font-family: var(--f-label); font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted);
+}
+.card .open { color: var(--gold); font-weight: 600; }
+.done { color: var(--gold); font-weight: 600; }
+
+.hero {
+  position: absolute; left: 0; right: 0; top: calc(64px + env(safe-area-inset-top, 0px)); text-align: center;
+  padding-inline: 16px; pointer-events: none;
+}
+.ornament { display: flex; align-items: center; justify-content: center; gap: 12px; color: var(--gold); }
+.ornament::before, .ornament::after { content: ""; height: 1px; width: min(120px, 22vw); background: var(--gold-soft); }
+.hero { text-shadow: 0 2px 24px rgba(10, 8, 12, 0.65); }
+.hero .pre { font-family: var(--f-display); font-weight: 500; font-size: clamp(1.8rem, 5vw, 3rem); color: #f7ecd6; line-height: 1; margin: 10px 0 0; }
+.hero h1 {
+  margin: 0; font-family: var(--f-display); font-weight: 600; color: #fbf2df;
+  font-size: clamp(3rem, 13vw, 7.5rem); line-height: 0.95; letter-spacing: 0.04em; text-transform: uppercase;
+}
+.hero .tag { font-style: italic; font-size: clamp(1.05rem, 2.6vw, 1.35rem); margin: 10px 0 0; color: #efe2c8; }
+.hero .ornament { color: #e9c27a; }
+.hint {
+  position: absolute; left: 50%; bottom: calc(22px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%);
+  font-family: var(--f-label); font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(247, 236, 214, 0.85);
+  display: flex; flex-direction: column; align-items: center; gap: 4px; pointer-events: none;
+}
+.finale {
+  position: absolute; left: 0; right: 0; bottom: calc(44px + env(safe-area-inset-bottom, 0px)); text-align: center; padding-inline: 16px;
+}
+.finale blockquote { margin: 0; font-family: var(--f-display); font-style: italic; font-weight: 500; font-size: clamp(1.8rem, 5vw, 2.8rem); color: #fbf2df; line-height: 1.1; text-shadow: 0 2px 24px rgba(10, 8, 12, 0.7); }
+.finale cite { display: block; margin-top: 6px; font-style: normal; color: #e9c27a; font-size: 1rem; }
+.finale .motto { font-family: var(--f-label); font-size: 0.75rem; letter-spacing: 0.16em; text-transform: uppercase; margin: 16px 0 12px; color: #efe2c8; text-shadow: 0 1px 12px rgba(10, 8, 12, 0.8); }
 .btn {
-  display: inline-flex; align-items: center; gap: 6px; cursor: pointer;
-  border: 1px solid var(--line); background: var(--surface); border-radius: 999px; color: var(--title);
-  padding: 8px 18px; font-family: var(--f-mono); font-size: 0.8rem; letter-spacing: 0.06em; font-weight: 600; line-height: 1.2;
+  display: inline-flex; align-items: center; gap: 6px; cursor: pointer; text-decoration: none;
+  border: 1px solid var(--line); background: var(--card); color: var(--title); border-radius: 999px;
+  padding: 8px 18px; font-family: var(--f-label); font-size: 0.8rem; letter-spacing: 0.06em; font-weight: 600;
 }
 .btn:hover { border-color: var(--gold); }
-a.btn { text-decoration: none; }
-.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); font-weight: 600; }
+.btn.primary { background: var(--badge-bg); color: var(--badge-fg); border-color: var(--badge-bg); }
 .btn.danger { color: var(--danger); }
-.btn.danger.armed { background: var(--danger); border-color: var(--danger); color: var(--surface); }
-.btn.small { padding: 4px 10px; font-size: 0.85rem; }
+.btn.armed { background: var(--danger); border-color: var(--danger); color: var(--card); }
 
-/* Toolbar */
-.toolbar {
-  display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center;
-  font-family: var(--f-mono); font-size: 0.78rem;
+.world > .cloud { pointer-events: none; }
+.walk {
+  position: fixed; left: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); z-index: 26; transition: opacity 0.3s;
 }
-.search { flex: 1 1 220px; min-width: 0; position: relative; }
-.search input {
-  width: 100%; border: 1px solid var(--line); background: var(--surface); border-radius: 999px;
-  padding: 8px 16px; font-family: var(--f-body); font-size: 1rem;
-}
-.chips { display: flex; flex-wrap: wrap; gap: 6px; }
-.chip {
-  cursor: pointer; border: 1px solid var(--line); background: var(--surface); border-radius: 999px;
-  padding: 4px 10px 4px 8px; display: inline-flex; align-items: center; gap: 6px;
-  text-transform: uppercase; letter-spacing: 0.06em; font-size: 0.7rem;
-}
-.chip .sw { width: 9px; height: 9px; border-radius: 50%; background: var(--c); }
-.chip[aria-pressed="false"] { opacity: 0.45; }
-.chip[aria-pressed="false"] .sw { background: transparent; box-shadow: inset 0 0 0 1.5px var(--c); }
-.zoom { display: flex; align-items: center; gap: 8px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
-.zoom input { width: 130px; accent-color: var(--accent); }
+.walk.away { opacity: 0; pointer-events: none; }
+@media (max-width: 600px) { .hint { bottom: calc(74px + env(safe-area-inset-bottom, 0px)); } }
 
-/* Timeline */
-.tl-frame { border: 1px solid var(--line); border-radius: 14px; background: var(--surface); overflow: hidden; box-shadow: var(--shadow); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
-.tl-scroll { overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain; }
-.tl { position: relative; min-height: 220px; }
-.band { position: absolute; top: 0; bottom: 0; border-right: 1px solid var(--line); }
-.band:nth-child(odd) { background: var(--band-a); }
-.band:nth-child(even) { background: var(--band-b); }
-.band-lbl {
-  position: absolute; top: 0; left: 0; right: 0; height: 30px; padding: 6px 8px 0;
-  font-family: var(--f-display); font-style: italic; font-size: 1rem; color: var(--c-era);
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  background: none; border: 0; text-align: left; cursor: pointer;
+/* Step rail */
+.rail {
+  position: fixed; right: 10px; top: 50%; transform: translateY(-50%); z-index: 25;
+  display: flex; flex-direction: column; align-items: center; gap: 8px; transition: opacity 0.3s;
 }
-.band-lbl:hover { text-decoration: underline; }
-.tick { position: absolute; top: 30px; bottom: 0; border-left: 1px dashed var(--line); }
-.tick span {
-  position: absolute; top: 4px; left: 4px; font-family: var(--f-mono); font-size: 0.68rem;
-  color: var(--muted); white-space: nowrap; font-variant-numeric: tabular-nums;
+.rail::before { content: ""; position: absolute; top: 14px; bottom: 14px; left: 50%; width: 2px; margin-left: -1px; background: var(--gold-soft); z-index: -1; }
+.rail button {
+  width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--gold-soft); cursor: pointer;
+  background: var(--card); color: var(--title); font-family: var(--f-label); font-weight: 800; font-size: 0.72rem; padding: 0;
 }
-.undated {
-  position: absolute; left: 0; top: 0; bottom: 0; border-right: 2px solid var(--line);
-  background: var(--surface-2);
-}
-.undated-h {
-  font-family: var(--f-display); font-style: italic; color: var(--c-era); font-size: 1rem;
-  padding: 6px 10px 0; height: 30px;
-}
-.undated-note { position: absolute; top: 34px; left: 10px; font-family: var(--f-mono); font-size: 0.68rem; color: var(--muted); }
+.rail button.on { background: var(--badge-bg); color: var(--badge-fg); border-color: var(--badge-bg); transform: scale(1.15); }
+.rail button.learned:not(.on) { border-color: var(--gold); color: var(--gold); }
+.rail.away { opacity: 0; pointer-events: none; }
 
-.mk {
-  position: absolute; height: 24px; display: flex; align-items: center; gap: 6px;
-  background: none; border: 0; padding: 0; cursor: pointer; white-space: nowrap;
-  font-size: 0.86rem; color: var(--ink); text-align: left;
+/* Overview */
+/* Weekly reading: study cards */
+.reading { max-width: 900px; margin: 0 auto; padding-inline: 16px; padding-block: 72px 8px; display: grid; gap: 16px; }
+.reading h2 { font-family: var(--f-display); font-weight: 600; font-size: clamp(2rem, 5vw, 2.8rem); color: var(--title); margin: 0; text-align: center; line-height: 1.1; }
+.reading .lead { text-align: center; margin: 0 auto; max-width: 52ch; color: var(--muted); }
+.st-group { display: grid; gap: 10px; }
+.st-group h3 { margin: 8px 0 0; font-family: var(--f-label); font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold); display: flex; align-items: center; gap: 10px; }
+.st-group h3::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+.st-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr)); gap: 12px; }
+.st-card {
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); text-shadow: none;
+  display: grid; gap: 6px; align-content: start; text-align: left; cursor: pointer; min-width: 0;
+  background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 16px 16px 14px; box-shadow: var(--shadow);
+  transition: transform 0.15s, border-color 0.15s;
 }
-.mk .dot { width: 11px; height: 11px; border-radius: 50%; background: var(--c); flex: none; box-shadow: 0 0 0 3px var(--surface-solid); }
-.mk.approx .dot { background: var(--surface-solid); box-shadow: inset 0 0 0 2.5px var(--c), 0 0 0 3px var(--surface-solid); }
-.mk .bar {
-  position: absolute; left: 0; top: 2px; height: 20px; border-radius: 3px;
-  background: color-mix(in srgb, var(--c) 18%, transparent); border-left: 3px solid var(--c);
+.st-card:hover { border-color: var(--gold); transform: translateY(-2px); }
+.st-card .ref { font-family: var(--f-label); font-weight: 800; text-transform: uppercase; font-size: 1.05rem; color: var(--title); letter-spacing: 0.02em; }
+.st-card .theme { font-style: italic; color: var(--muted); line-height: 1.35; font-size: 1rem; }
+.st-card .meta { display: flex; justify-content: space-between; gap: 8px; margin-top: 6px; font-family: var(--f-label); font-size: 0.66rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.st-card .meta .go { color: var(--gold); font-weight: 600; }
+.st-card .bar { height: 4px; border-radius: 2px; background: var(--parch-2); overflow: hidden; }
+.st-card .bar i { display: block; height: 100%; background: var(--gold); }
+.st-card.add { border-style: dashed; background: transparent; box-shadow: none; align-content: center; justify-items: center; text-align: center; color: var(--gold); min-height: 120px; }
+.st-card.add .ref { color: var(--gold); }
+form.add-passage { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: center; }
+form.add-passage input { flex: 1 1 200px; min-width: 0; max-width: 320px; border: 1px solid var(--line); background: var(--card); border-radius: 999px; padding: 8px 14px; }
+.blessing { margin: 10px 0 0; text-align: center; font-family: var(--f-display); font-style: italic; font-weight: 500; font-size: clamp(1.5rem, 4vw, 2.1rem); color: var(--title); text-wrap: balance; }
+.qa { display: grid; gap: 6px; padding: 12px 0; border-bottom: 1px dashed var(--line); }
+.qa .q { font-weight: 500; color: var(--title); display: flex; gap: 10px; }
+.qa .q .n { font-family: var(--f-label); font-weight: 800; color: var(--gold); flex: none; }
+.qa textarea, .study-notes {
+  width: 100%; min-height: 80px; resize: vertical; border: 1px solid var(--line); background: var(--card); border-radius: 8px; padding: 8px 10px; font-size: 1rem;
 }
-.mk.span .lbl { position: relative; padding-left: 8px; }
-.mk .lbl { line-height: 1; }
-.mk:hover .lbl, .mk.sel .lbl { text-decoration: underline; text-underline-offset: 3px; }
-.mk.sel .dot, .mk.sel .bar { outline: 2px solid var(--ink); outline-offset: 2px; }
-.mk.dim { opacity: 0.18; }
-.tl-foot {
-  display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 16px; padding: 8px 12px;
-  border-top: 1px solid var(--line); font-family: var(--f-mono); font-size: 0.7rem; color: var(--muted);
+.qa .row { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.saved { font-family: var(--f-label); font-size: 0.66rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gold); min-height: 1em; }
+.num svg { width: 26px; height: 26px; }
+.qa .del { background: none; border: 0; color: var(--muted); cursor: pointer; font-size: 0.8rem; font-family: var(--f-label); padding: 2px 4px; }
+.qa .del.armed { color: var(--danger); font-weight: 600; }
+.qa .mine-tag { font-family: var(--f-label); font-size: 0.62rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.overview { max-width: 760px; margin: 0 auto; padding-inline: 16px; padding-block: 72px 40px; display: grid; gap: 18px; }
+.overview h2 { font-family: var(--f-display); font-weight: 600; font-size: clamp(2rem, 5vw, 2.8rem); color: var(--title); margin: 0; text-align: center; line-height: 1.1; text-wrap: balance; }
+.overview .lead { text-align: center; margin: 0 auto; max-width: 56ch; color: var(--muted); }
+.progress { text-align: center; font-family: var(--f-label); font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold); }
+.ov-list { list-style: none; margin: 10px 0 0; padding: 0; position: relative; display: grid; gap: 10px; }
+.ov-list::before { content: ""; position: absolute; left: 22px; top: 24px; bottom: 24px; width: 2px; background: var(--gold-soft); }
+.ov-item {
+  position: relative; width: 100%; display: grid; grid-template-columns: auto 1fr auto; gap: 16px; align-items: center;
+  background: none; border: 1px solid transparent; border-radius: 12px; padding: 12px 12px 12px 0; cursor: pointer; text-align: left;
 }
-.legend { display: flex; flex-wrap: wrap; gap: 4px 14px; align-items: center; }
-.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; vertical-align: -1px; margin-right: 4px; }
+.ov-item:hover { border-color: var(--line); background: var(--card); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+.ov-item .txt { min-width: 0; }
+.ov-item .meta { display: block; font-family: var(--f-label); font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-top: 4px; }
+.closing { text-align: center; display: grid; gap: 8px; padding-block: 24px 8px; }
+.closing blockquote { margin: 0; font-family: var(--f-display); font-style: italic; font-size: 1.8rem; color: var(--title); }
+.closing cite { color: var(--gold); font-style: normal; }
+.note { text-align: center; color: var(--muted); font-size: 0.9rem; }
 
-/* Chronicle list */
-.cols { display: grid; grid-template-columns: minmax(0, 1fr); gap: 24px; }
-h2 { font-family: var(--f-display); font-weight: 600; font-size: 2rem; margin: 0; color: var(--title); }
-.list-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
-.count { font-family: var(--f-mono); font-size: 0.75rem; color: var(--muted); }
-.chron { list-style: none; margin: 8px 0 0; padding: 0; }
-.chron .era-h {
-  font-family: var(--f-mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em;
-  color: var(--c-era); padding: 18px 0 6px; border-bottom: 1px solid var(--line);
+/* Study sheet */
+.scrim { position: fixed; inset: 0; background: var(--scrim); z-index: 40; }
+.sheet {
+  position: fixed; z-index: 41; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  width: min(700px, calc(100% - 24px)); max-height: min(88vh, 900px);
+  display: grid; grid-template-rows: auto minmax(0, 1fr) auto;
+  filter: drop-shadow(0 18px 30px rgba(40, 25, 5, 0.35));
 }
-.row {
-  display: grid; grid-template-columns: 10.5rem 1fr; gap: 4px 16px; padding: 10px 0;
-  border-bottom: 1px solid var(--line); cursor: pointer;
+.sheet.unroll { animation: unroll 0.75s cubic-bezier(.2, .7, .2, 1) both; }
+@keyframes unroll { from { max-height: 60px; } to { max-height: min(88vh, 900px); } }
+.roller {
+  position: relative; height: 22px; margin-inline: 2px; border-radius: 11px; z-index: 2;
+  background: linear-gradient(var(--wood-2), var(--wood-1) 55%, var(--wood-1));
 }
-.row:hover .t { text-decoration: underline; text-underline-offset: 3px; }
-.row .d { font-family: var(--f-mono); font-size: 0.8rem; color: var(--muted); font-variant-numeric: tabular-nums; padding-top: 2px; }
-.row .main { min-width: 0; }
-.row .t { font-weight: 600; color: var(--title); }
-.row .t::before {
-  content: ""; display: inline-block; width: 9px; height: 9px; border-radius: 50%;
-  background: var(--c); margin-right: 8px; vertical-align: 1px;
+.roller::before, .roller::after {
+  content: ""; position: absolute; top: -5px; width: 16px; height: 32px; border-radius: 8px;
+  background: linear-gradient(90deg, var(--wood-1), var(--wood-2), var(--wood-1));
 }
-.row .ref { color: var(--gold); font-style: italic; margin-left: 6px; font-weight: 400; }
-.row .n { color: var(--muted); font-size: 0.92rem; margin-top: 2px; }
-.empty { color: var(--muted); padding: 16px 0; }
-@media (max-width: 560px) {
-  .row { grid-template-columns: 1fr; }
+.roller::before { left: -8px; }
+.roller::after { right: -8px; }
+.paper {
+  margin-inline: 14px; overflow-y: auto; overscroll-behavior: contain; min-height: 0;
+  background: radial-gradient(ellipse at 50% 40%, var(--paper) 55%, var(--paper-edge) 130%);
+  box-shadow: inset 0 10px 12px -8px rgba(60, 35, 10, 0.35), inset 0 -10px 12px -8px rgba(60, 35, 10, 0.35);
 }
-
-/* Drawer */
-.scrim { position: fixed; inset: 0; background: rgba(6, 6, 10, 0.55); z-index: 10; }
-.drawer {
-  position: fixed; top: 0; right: 0; bottom: 0; width: min(440px, 100%); z-index: 11;
-  background: var(--surface-solid); border-left: 1px solid var(--line); box-shadow: var(--shadow);
-  display: flex; flex-direction: column;
-  padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px);
+@media (max-width: 600px) {
+  .sheet { left: 0; right: 0; bottom: 0; top: auto; transform: none; width: 100%; max-height: 90vh; padding-bottom: env(safe-area-inset-bottom, 0px); }
+  @keyframes unroll { from { max-height: 60px; } to { max-height: 90vh; } }
 }
-.drawer-h { display: flex; justify-content: space-between; align-items: center; padding: 14px 18px; border-bottom: 1px solid var(--line); }
-.drawer-h .kicker { font-family: var(--f-mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); }
-.x { background: none; border: 0; font-size: 1.5rem; line-height: 1; cursor: pointer; color: var(--muted); padding: 2px 6px; }
-.drawer-b { padding: 18px; overflow-y: auto; display: grid; gap: 14px; align-content: start; }
-.drawer-b h3 { color: var(--title); font-family: var(--f-display); font-weight: 600; font-size: 1.9rem; line-height: 1.1; margin: 0; text-wrap: balance; }
-.meta { display: flex; flex-wrap: wrap; gap: 8px 14px; font-family: var(--f-mono); font-size: 0.78rem; color: var(--muted); }
-.tag { display: inline-flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.06em; }
-.tag i { width: 9px; height: 9px; border-radius: 50%; background: var(--c); }
-.refline { color: var(--gold); font-style: italic; font-size: 1.05rem; }
-.notes { white-space: pre-wrap; }
-.btns { display: flex; flex-wrap: wrap; gap: 8px; }
-
-form.edit { display: grid; gap: 14px; }
-.field { display: grid; gap: 4px; }
-.field > label, .field > .lab {
-  font-family: var(--f-mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted);
+.sheet-h {
+  position: sticky; top: 0; z-index: 1; background: var(--paper); border-bottom: 1px solid var(--line);
+  display: grid; grid-template-columns: auto 1fr auto; gap: 14px; align-items: center; padding: 16px 18px;
 }
-.field input[type="text"], .field input[type="number"], .field select, .field textarea {
-  width: 100%; border: 1px solid var(--line); background: var(--field); border-radius: 8px; padding: 8px 10px;
+.sheet-h .kicker { font-family: var(--f-label); font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+.sheet-h h2 { margin: 0; font-family: var(--f-label); font-weight: 800; text-transform: uppercase; font-size: 1.35rem; color: var(--title); line-height: 1.1; }
+.x { background: none; border: 0; font-size: 1.8rem; line-height: 1; cursor: pointer; color: var(--muted); padding: 4px 8px; align-self: start; }
+.sheet-b { padding: 6px 22px 24px; display: grid; gap: 6px; }
+.sheet-b h4 {
+  margin: 18px 0 6px; font-family: var(--f-label); font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold);
+  display: flex; align-items: center; gap: 10px;
 }
-.field textarea { min-height: 110px; resize: vertical; }
-.yr { display: grid; grid-template-columns: 1fr 5.5rem; gap: 6px; }
-.two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.check { display: flex; gap: 8px; align-items: center; font-size: 0.95rem; }
-.check input { accent-color: var(--accent); width: 16px; height: 16px; }
-.err { color: var(--danger); font-size: 0.9rem; min-height: 1.2em; }
-.hint { color: var(--muted); font-size: 0.85rem; }
-textarea.json { width: 100%; min-height: 220px; font-family: var(--f-mono); font-size: 0.75rem; border: 1px solid var(--line); background: var(--field); border-radius: 8px; padding: 8px; }
+.sheet-b h4::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+.scripture { margin: 0 0 10px; padding: 2px 0 2px 16px; border-left: 2px solid var(--gold-soft); }
+.scripture p { margin: 0; font-family: var(--f-display); font-style: italic; font-size: 1.25rem; line-height: 1.4; color: var(--title); }
+.scripture cite { display: block; font-style: normal; font-size: 0.92rem; color: var(--gold); margin-top: 2px; }
+.lesson { margin: 0; }
+ol.steps { margin: 0; padding-left: 1.3em; display: grid; gap: 6px; }
+ol.steps li::marker { color: var(--gold); font-family: var(--f-label); font-weight: 800; font-size: 0.85em; }
+.mine { display: grid; gap: 10px; }
+.entry { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: start; background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; }
+.entry .body { min-width: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.entry .body .r { font-family: var(--f-label); font-size: 0.75rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--gold); display: block; }
+.entry .when { display: block; font-family: var(--f-label); font-size: 0.66rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-top: 4px; }
+.entry .del { background: none; border: 0; color: var(--muted); cursor: pointer; font-size: 0.8rem; font-family: var(--f-label); padding: 2px 4px; }
+.entry .del.armed { color: var(--danger); font-weight: 600; }
+.empty { color: var(--muted); font-style: italic; margin: 0; }
+form.add { display: grid; gap: 8px; margin-top: 4px; }
+form.add input, form.add textarea {
+  width: 100%; border: 1px solid var(--line); background: var(--card); border-radius: 8px; padding: 8px 10px; font-size: 1rem;
+}
+form.add textarea { min-height: 84px; resize: vertical; }
+form.add .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+form.add .err { color: var(--danger); font-size: 0.9rem; }
+.sheet-f { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--line); }
 .toast {
-  position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%);
-  background: var(--title); color: var(--bg); padding: 8px 16px; border-radius: 999px; z-index: 20; font-family: var(--f-mono); font-size: 0.8rem;
+  position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); z-index: 50;
+  background: var(--title); color: var(--parch); padding: 8px 16px; border-radius: 999px; font-family: var(--f-label); font-size: 0.8rem;
 }
-footer.note { color: var(--muted); font-size: 0.88rem; max-width: 75ch; }
-@media (max-width: 460px) { .two { grid-template-columns: 1fr; } }
-@media (prefers-reduced-motion: no-preference) {
-  .drawer { animation: slide 0.18s ease-out; }
-  @keyframes slide { from { transform: translateX(24px); opacity: 0.6; } }
+
+/* No 3D walk for people who ask for less motion: the overview carries everything. */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-snap-type: none; }
+  .journey, .rail, .walk { display: none; }
 }
 </style>
 </head>
 <body>
 <div class="backdrop" aria-hidden="true"></div>
-<div class="wrap">
-  <nav class="topbar">
-    <a href="salvation.html">✝ <span class="brand-txt">Pattern of Salvation</span></a>
-    <span class="links"><a href="salvation.html#leeswerk">Leeswerk</a><a href="salvation.html#overview">All steps</a><a href="index.html" aria-current="page">Bible Timeline</a></span>
-  </nav>
-  <header class="top">
-    <div>
+
+<nav class="topbar">
+  <a href="#top" id="brand" aria-label="Back to the start">✝ <span class="brand-txt">Pattern of Salvation</span></a>
+  <span class="links"><a href="#leeswerk">Leeswerk</a><a href="#overview">All steps</a><a href="timeline.html" id="timelineLink">Bible Timeline</a></span>
+</nav>
+
+<section class="journey" id="journey" aria-label="Walk the path: scroll to move from step to step">
+  <a id="top"></a>
+  <div class="stage" id="stage">
+    <img class="sky-photo" id="skyPhoto" src="images/heaven-clouds.jpg" alt="" aria-hidden="true" decoding="async">
+    <div class="rays" id="rays" aria-hidden="true"></div>
+    <div class="sun" id="sun"></div>
+    <div class="vignette" aria-hidden="true"></div>
+    <div class="world" id="world"></div>
+    <div class="hero" id="hero">
       <div class="ornament" aria-hidden="true">✝</div>
-      <h1>Bible Timeline <em>·</em> from Abraham to Revelation</h1>
-      <p class="sub">Map the story of Scripture across the centuries. Click anything to read its details, add your own events, people and books, and keep your timeline in this browser.</p>
+      <p class="pre">The Pattern of</p>
+      <h1>Salvation</h1>
+      <p class="tag">God's work in you. Your walk with Him.</p>
     </div>
-    <div class="actions">
-      <button class="btn primary" id="addBtn" type="button">+ Add to timeline</button>
-      <a class="btn" href="salvation.html">✝ Pattern of Salvation</a>
-      <button class="btn" id="dataBtn" type="button">Save &amp; share</button>
+    <div class="finale" id="finale" hidden>
+      <blockquote>“Behold, I make all things new.”<cite>Revelation 21:5</cite></blockquote>
+      <p class="motto">Growing in Him · Reflecting His love</p>
+      <a class="btn primary" href="#overview">See the whole pattern</a>
     </div>
-  </header>
-
-  <div class="toolbar">
-    <div class="search"><input id="q" type="search" placeholder="Search names, places, references…" aria-label="Search the timeline"></div>
-    <div class="chips" id="chips" aria-label="Show or hide categories"></div>
-    <label class="zoom" for="zoom">Zoom <input id="zoom" type="range" min="0" max="100" value="38"></label>
+    <div class="hint" id="hint" aria-hidden="true">Scroll to walk the path<span>↓</span></div>
   </div>
+</section>
 
-  <section class="tl-frame" aria-label="Timeline">
-    <div class="tl-scroll" id="tlScroll"><div class="tl" id="tl"></div></div>
-    <div class="tl-foot">
-      <div class="legend">
-        <span><i style="background:var(--c-event)"></i>solid dot: date fairly firm</span>
-        <span><i style="box-shadow:inset 0 0 0 2px var(--c-event)"></i>hollow dot: approximate</span>
-        <span>bars: spans of years</span>
-      </div>
-      <span>Scroll sideways to travel through time</span>
-    </div>
-  </section>
+<nav class="rail" id="rail" aria-label="Jump to a step"></nav>
+<button type="button" class="btn primary walk" id="walkBtn" aria-pressed="false">▶ Walk the path</button>
 
-  <section class="cols">
-    <div>
-      <div class="list-head"><h2>Chronicle</h2><span class="count" id="count"></span></div>
-      <ul class="chron" id="list"></ul>
-    </div>
-  </section>
+<section class="reading" id="leeswerk" aria-labelledby="rdTitle">
+  <div class="ornament" aria-hidden="true">✝</div>
+  <h2 id="rdTitle">Week se leeswerk</h2>
+  <p class="lead">Tap a passage to see what it says, read its key verses, and answer questions about it. Your answers save as you type.</p>
+  <div id="studyGroups"></div>
+  <p class="blessing">May grace and shalom be ours in full measure</p>
+</section>
 
-  <footer class="note">
-    Dates follow one widely used conservative chronology (Exodus c. 1446 BC, divided kingdom 931 BC, crucifixion c. AD 30). Scholars disagree on many of them, and the events before Abraham have no agreed dates, so they sit in their own undated column. Edit any entry to match the chronology you prefer.
-  </footer>
-</div>
+<section class="overview" id="overview">
+  <div class="ornament" aria-hidden="true">✝</div>
+  <h2>The Pattern at a Glance</h2>
+  <p class="lead">Seven steps from a first choice to reflecting God's image. Open any step to read its Scripture, what it teaches, and how to live it. Add your own verses and lessons as you learn.</p>
+  <p class="progress" id="progress"></p>
+  <ol class="ov-list" id="ovList"></ol>
+  <div class="closing">
+    <blockquote>“Behold, I make all things new.”</blockquote>
+    <cite>Revelation 21:5</cite>
+  </div>
+  <p class="note">Scripture quoted from the King James Version (public domain). Your own verses and lessons are saved in this browser only.</p>
+</section>
 
 <div class="scrim" id="scrim" hidden></div>
-<aside class="drawer" id="drawer" hidden aria-modal="true" role="dialog" aria-labelledby="drawerKicker">
-  <div class="drawer-h"><span class="kicker" id="drawerKicker"></span><button class="x" id="closeBtn" type="button" aria-label="Close">×</button></div>
-  <div class="drawer-b" id="drawerBody"></div>
-</aside>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle" hidden>
+  <div class="roller" aria-hidden="true"></div>
+  <div class="paper" id="paper"></div>
+  <div class="roller" aria-hidden="true"></div>
+</div>
 <div class="toast" id="toast" hidden></div>
 
 <script>
 (() => {
   "use strict";
-  const STORE_KEY = "bible-timeline-v1";
-  const UNDATED_W = 230;
-  const LANE_H = 30;
-  const TOP = 66;
 
-  const CATS = {
-    era: "Era", event: "Event", person: "Person", reign: "Reign",
-    prophet: "Prophet", writing: "Book written", history: "World history"
+  const ICONS = {
+    heart: '<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M24 40S7 30 7 17.5C7 12 11 8 16 8c3.6 0 6.4 2 8 5 1.6-3 4.4-5 8-5 5 0 9 4 9 9.5C41 30 24 40 24 40z"/></svg>',
+    book: '<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M5 11h13a6 6 0 0 1 6 6v22a5 5 0 0 0-5-5H5z"/><path d="M43 11H30a6 6 0 0 0-6 6v22a5 5 0 0 1 5-5h14z"/><path d="M14.5 16v12M10.5 20h8M33.5 16v12M29.5 20h8"/></svg>',
+    path: '<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 46c0-9 22-8 22-17s-15-8-12-17"/><path d="M18 46c1-6 21-7 21-16"/><path d="M24 2v9M20.5 5.5h7"/></svg>',
+    hands: '<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M24 25s-8-5-8-11a4.5 4.5 0 0 1 8-2.6A4.5 4.5 0 0 1 32 14c0 6-8 11-8 11z"/><path d="M5 22l5 11c2 4 6 6 10 6h1v-7c0-3-2-5-4-6l-6-4"/><path d="M43 22l-5 11c-2 4-6 6-10 6h-1v-7c0-3 2-5 4-6l6-4"/></svg>',
+    cycle: '<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M39 21A15 15 0 0 0 12 13"/><path d="M9 27a15 15 0 0 0 27 8"/><path d="M12 6v7h7"/><path d="M36 42v-7h-7"/></svg>',
+    shield: '<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M24 5l15 5v12c0 10-7 16-15 20C16 38 9 32 9 22V10z"/><path d="M24 14v18M18 20h12"/></svg>',
+    image: '<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="24" cy="18" r="6"/><path d="M12 42c0-7 5-12 12-12s12 5 12 12"/><path d="M24 3v4M24 1v0M10 8l3 3M38 8l-3 3M4 20h4M40 20h4M7 32l3-2M41 32l-3-2"/></svg>'
   };
 
-  // year: negative = BC, positive = AD, null = undated
-  const SAMPLE = [
-    ["era", "Patriarchs", -2166, -1876, "Gen 12–50", "Abraham, Isaac, Jacob and Joseph."],
-    ["era", "Egypt & Exodus", -1876, -1406, "Exodus–Deuteronomy", "Israel grows in Egypt, is enslaved, and is brought out under Moses."],
-    ["era", "Conquest & Judges", -1406, -1050, "Joshua–Judges, Ruth", ""],
-    ["era", "United Kingdom", -1050, -931, "1 Samuel–1 Kings 11", "Saul, David and Solomon rule all twelve tribes."],
-    ["era", "Divided Kingdom", -931, -586, "1 Kings 12–2 Kings 25", "Israel in the north, Judah in the south."],
-    ["era", "Exile", -586, -538, "Daniel, Ezekiel, Lamentations", ""],
-    ["era", "Return & Rebuilding", -538, -430, "Ezra, Nehemiah, Esther", ""],
-    ["era", "Between the Testaments", -430, -5, "", "About four centuries with no new prophetic book: Persian, Greek, Hasmonean and Roman rule."],
-    ["era", "Life of Jesus", -5, 30, "Matthew–John", ""],
-    ["era", "Early Church", 30, 100, "Acts–Revelation", ""],
+  const STEPS = [
+    {
+      name: "Choose", sub: "a deliberate choice to follow God", icon: "heart",
+      verses: [
+        ["Deuteronomy 30:19", "I call heaven and earth to record this day against you, that I have set before you life and death, blessing and cursing: therefore choose life, that both thou and thy seed may live."],
+        ["Joshua 24:15", "Choose you this day whom ye will serve … but as for me and my house, we will serve the LORD."],
+        ["Luke 9:23", "If any man will come after me, let him deny himself, and take up his cross daily, and follow me."]
+      ],
+      lesson: "Following God begins with a decision. God sets life before us and invites us to choose it; nobody drifts into discipleship by accident. Joshua made his choice out loud and for his whole household, and Jesus says the choice is renewed daily. The first step is yours to take, and you take it again every morning.",
+      live: [
+        "Write down your decision to follow God, with today's date, and keep it where you will see it.",
+        "Start each morning by choosing again in a short prayer before anything else.",
+        "Tell one person you trust about the choice you have made."
+      ]
+    },
+    {
+      name: "Identity", sub: "understand who you are in Him", icon: "book",
+      verses: [
+        ["2 Corinthians 5:17", "Therefore if any man be in Christ, he is a new creature: old things are passed away; behold, all things are become new."],
+        ["1 Peter 2:9", "But ye are a chosen generation, a royal priesthood, an holy nation, a peculiar people; that ye should shew forth the praises of him who hath called you out of darkness into his marvellous light."],
+        ["John 1:12", "But as many as received him, to them gave he power to become the sons of God, even to them that believe on his name."]
+      ],
+      lesson: "In Christ you are a new creation: chosen, called and adopted as a child of God. Your worth comes from whose you are, not from your past, your failures or your performance. Knowing this identity is the ground everything else is built on; we live out of who God says we are, not toward earning it.",
+      live: [
+        "Read Ephesians 1 and list every phrase that says “in him” or “in Christ”.",
+        "When an old label or accusation comes back, answer it out loud with one of these verses.",
+        "Write one sentence that describes who you are in Christ and read it daily this week."
+      ]
+    },
+    {
+      name: "Walk in His Footprints", sub: "follow the example and ways of Jesus", icon: "path",
+      verses: [
+        ["1 Peter 2:21", "For even hereunto were ye called: because Christ also suffered for us, leaving us an example, that ye should follow his steps."],
+        ["1 John 2:6", "He that saith he abideth in him ought himself also so to walk, even as he walked."],
+        ["John 13:15", "For I have given you an example, that ye should do as I have done to you."]
+      ],
+      lesson: "Jesus did not only teach; he left steps for us to walk in. The Gospels show how he prayed, how he treated the overlooked, how he served and how he obeyed the Father even when it cost him. To follow him we watch closely what he did and then put our feet where his were.",
+      live: [
+        "Read one Gospel chapter a day and ask: what did Jesus do here, and why?",
+        "Pick one of his actions (washing feet, eating with outsiders, withdrawing to pray) and imitate it this week.",
+        "Before a hard conversation, ask how Jesus would speak in your place."
+      ]
+    },
+    {
+      name: "Practice", sub: "put faith into action daily", icon: "hands",
+      verses: [
+        ["James 1:22", "But be ye doers of the word, and not hearers only, deceiving your own selves."],
+        ["James 2:17", "Even so faith, if it hath not works, is dead, being alone."],
+        ["Matthew 7:24", "Therefore whosoever heareth these sayings of mine, and doeth them, I will liken him unto a wise man, which built his house upon a rock."]
+      ],
+      lesson: "Faith grows when it is used. Hearing the Word without doing it deceives us into thinking we have changed when we have not. Jesus says the wise builder is the one who hears and does. Small, concrete acts of obedience each day are how belief becomes a life built on rock.",
+      live: [
+        "After every Bible reading, write one specific thing you will do today because of it.",
+        "Do one quiet act of kindness each day that no one will thank you for.",
+        "At night, look back: where did I obey today, and where did I only listen?"
+      ]
+    },
+    {
+      name: "Habits", sub: "deliberate decisions repeated consistently", icon: "cycle",
+      verses: [
+        ["Daniel 6:10", "He kneeled upon his knees three times a day, and prayed, and gave thanks before his God, as he did aforetime."],
+        ["Luke 4:16", "And, as his custom was, he went into the synagogue on the sabbath day, and stood up for to read."],
+        ["Galatians 6:9", "And let us not be weary in well doing: for in due season we shall reap, if we faint not."]
+      ],
+      lesson: "A habit is a deliberate decision repeated until it becomes the way you live. Daniel's prayer life was already in place before the lions' den, and Jesus had a custom of worship and Scripture. Habits carry us when feelings fade, and Paul promises a harvest to those who keep going.",
+      live: [
+        "Set a fixed time and place for prayer and Bible reading, and keep it like an appointment.",
+        "Start small enough that you can keep it every day, then grow it.",
+        "When you miss a day, start again the next day without giving up."
+      ]
+    },
+    {
+      name: "Character", sub: "Christlike character formed over time", icon: "shield",
+      verses: [
+        ["Galatians 5:22–23", "But the fruit of the Spirit is love, joy, peace, longsuffering, gentleness, goodness, faith, meekness, temperance: against such there is no law."],
+        ["Romans 5:3–4", "We glory in tribulations also: knowing that tribulation worketh patience; and patience, experience; and experience, hope."]
+      ],
+      lesson: "Habits, worked through by the Holy Spirit, form character: who we are when no one is watching. This fruit grows slowly, and often through difficulty. Trials are not wasted; God uses them to produce patience, proven faith and hope. Character is the fruit of the earlier steps, not a shortcut around them.",
+      live: [
+        "Choose one fruit of the Spirit to focus on this month and pray for it by name each day.",
+        "In a hard moment, ask: what is God forming in me through this?",
+        "Ask someone close to you where they have seen you grow, and where you still need to."
+      ]
+    },
+    {
+      name: "Image", sub: "reflect God's image and likeness", icon: "image",
+      verses: [
+        ["Genesis 1:27", "So God created man in his own image, in the image of God created he him; male and female created he them."],
+        ["2 Corinthians 3:18", "But we all, with open face beholding as in a glass the glory of the Lord, are changed into the same image from glory to glory, even as by the Spirit of the Lord."],
+        ["Romans 8:29", "For whom he did foreknow, he also did predestinate to be conformed to the image of his Son, that he might be the firstborn among many brethren."]
+      ],
+      lesson: "This is where the pattern leads. We were made in God's image, and salvation is God's work of restoring that image by conforming us to Christ. It happens as we behold him, gradually, “from glory to glory”. The goal is not only to be forgiven but to reflect his love to the world.",
+      live: [
+        "Spend unhurried time in worship simply looking at who God is.",
+        "Ask each day: does the way I love people show them what God is like?",
+        "Look back over the six earlier steps and thank God for the change you can already see."
+      ]
+    }
+  ];
 
-    ["event", "Creation", null, null, "Genesis 1–2", "", true],
-    ["event", "The Fall", null, null, "Genesis 3", "", true],
-    ["event", "The Flood", null, null, "Genesis 6–9", "", true],
-    ["event", "Tower of Babel", null, null, "Genesis 11", "", true],
-
-    ["person", "Abraham", -2166, -1991, "Genesis 11–25", ""],
-    ["event", "Call of Abram", -2091, null, "Genesis 12:1–4", "Abram leaves Haran at 75."],
-    ["person", "Isaac", -2066, -1886, "Genesis 21–35", ""],
-    ["person", "Jacob", -2006, -1859, "Genesis 25–50", "Renamed Israel (Gen 32:28)."],
-    ["event", "Joseph sold into Egypt", -1898, null, "Genesis 37", ""],
-    ["event", "Jacob's family settles in Egypt", -1876, null, "Genesis 46", "430 years before the Exodus (Ex 12:40)."],
-    ["person", "Moses", -1526, -1406, "Exodus–Deuteronomy", ""],
-    ["event", "The Exodus", -1446, null, "Exodus 12–14", "Dated from 1 Kings 6:1. A later date near 1270 BC is also widely held."],
-    ["event", "Law given at Sinai", -1445, null, "Exodus 19–20", ""],
-    ["event", "Wilderness wanderings", -1446, -1406, "Numbers 14", "Forty years in the wilderness."],
-    ["event", "Jericho falls", -1406, null, "Joshua 6", ""],
-    ["person", "Samuel", -1105, -1015, "1 Samuel 1–25", "Last of the judges."],
-    ["reign", "Saul", -1050, -1010, "1 Samuel 9–31", ""],
-    ["reign", "David", -1010, -970, "2 Samuel; 1 Chronicles 11–29", ""],
-    ["reign", "Solomon", -970, -931, "1 Kings 1–11", ""],
-    ["event", "First Temple dedicated", -959, null, "1 Kings 8", ""],
-    ["event", "Kingdom divides", -931, null, "1 Kings 12", "Rehoboam rules Judah, Jeroboam rules Israel.", false],
-    ["prophet", "Elijah", -875, -848, "1 Kings 17–2 Kings 2", ""],
-    ["prophet", "Isaiah", -740, -681, "Isaiah", ""],
-    ["event", "Fall of Samaria to Assyria", -722, null, "2 Kings 17", "End of the northern kingdom.", false],
-    ["event", "Josiah's reform", -622, null, "2 Kings 22–23", "The Book of the Law is found in the Temple."],
-    ["prophet", "Jeremiah", -627, -580, "Jeremiah", ""],
-    ["event", "Daniel taken to Babylon", -605, null, "Daniel 1", "", false],
-    ["prophet", "Ezekiel", -593, -571, "Ezekiel", ""],
-    ["event", "Jerusalem & Temple destroyed", -586, null, "2 Kings 25", "Nebuchadnezzar's army burns the city. Some date this to 587 BC.", false],
-    ["event", "Decree of Cyrus", -538, null, "Ezra 1", "First exiles return under Zerubbabel."],
-    ["event", "Second Temple completed", -516, null, "Ezra 6:15", "", false],
-    ["event", "Esther becomes queen", -479, null, "Esther 2"],
-    ["event", "Ezra returns to Jerusalem", -458, null, "Ezra 7"],
-    ["event", "Nehemiah rebuilds the walls", -445, null, "Nehemiah 1–6", "", false],
-    ["prophet", "Malachi", -430, null, "Malachi", "Last of the Old Testament prophets."],
-    ["history", "Alexander the Great conquers Judea", -332, null, "", "Greek language and culture spread through the region.", false],
-    ["history", "Septuagint translation begun", -250, null, "", "The Hebrew Scriptures translated into Greek in Alexandria."],
-    ["history", "Maccabean revolt", -167, -160, "1–2 Maccabees", "The Temple is rededicated in 164 BC, remembered at Hanukkah (John 10:22).", false],
-    ["history", "Pompey takes Jerusalem for Rome", -63, null, "", "", false],
-    ["reign", "Herod the Great", -37, -4, "Matthew 2", "", false],
-    ["event", "Birth of Jesus", -5, null, "Matthew 1–2; Luke 2", "Before Herod's death in 4 BC."],
-    ["prophet", "John the Baptist's ministry", 26, 29, "Luke 3", "Begins in the 15th year of Tiberius (Luke 3:1)."],
-    ["event", "Ministry of Jesus", 27, 30, "Matthew–John", "Many place it AD 29–33 instead."],
-    ["event", "Crucifixion & Resurrection", 30, null, "Matthew 26–28; John 18–21", ""],
-    ["event", "Pentecost", 30, null, "Acts 2", ""],
-    ["event", "Conversion of Paul", 34, null, "Acts 9"],
-    ["event", "Paul's 1st journey", 46, 48, "Acts 13–14"],
-    ["event", "Jerusalem Council", 49, null, "Acts 15"],
-    ["event", "Paul's 2nd journey", 49, 52, "Acts 15:36–18:22"],
-    ["writing", "1 Thessalonians", 51, null, "", "Likely Paul's earliest surviving letter."],
-    ["event", "Paul's 3rd journey", 53, 57, "Acts 18:23–21:16"],
-    ["writing", "Romans", 57, null, "", "Written from Corinth."],
-    ["writing", "Gospel of Mark", 60, null, "", "Often dated to the 60s."],
-    ["event", "Paul under house arrest in Rome", 60, 62, "Acts 28"],
-    ["history", "Temple destroyed by Rome", 70, null, "", "Titus ends the Jewish revolt.", false],
-    ["writing", "Revelation", 95, null, "Revelation 1:9", "Written on Patmos."]
-  ].map((r, i) => ({
-    id: "s" + i, cat: r[0], title: r[1], start: r[2], end: r[3], ref: r[4] || "", notes: r[5] || "",
-    approx: r[6] !== undefined ? r[6] : true
-  }));
-
-  // ---------- state ----------
-  let items = load() || clone(SAMPLE);
-  const hiddenCats = new Set();
-  let query = "";
-  let selectedId = null;
-
-  function clone(x) { return JSON.parse(JSON.stringify(x)); }
-  function load() {
-    try {
-      const raw = localStorage.getItem(STORE_KEY);
-      if (!raw) return null;
-      const parsed = normalize(JSON.parse(raw));
-      return parsed && parsed.length ? parsed : null;
-    } catch (e) { return null; }
-  }
-  function save() {
-    try { localStorage.setItem(STORE_KEY, JSON.stringify(items)); } catch (e) { /* storage unavailable */ }
-  }
-  function uid() {
-    try { return crypto.randomUUID(); } catch (e) { return "u" + Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
-  }
-  function normalize(data) {
-    const arr = Array.isArray(data) ? data : (data && Array.isArray(data.items) ? data.items : null);
-    if (!arr) return null;
-    const num = v => (v === null || v === undefined || v === "" || !isFinite(Number(v)) || Number(v) === 0) ? null : Math.round(Number(v));
-    return arr.filter(o => o && typeof o.title === "string" && o.title.trim()).map(o => {
-      let start = num(o.start), end = num(o.end);
-      if (start === null) end = null;
-      if (end !== null && end < start) end = null;
-      return {
-        id: typeof o.id === "string" && o.id ? o.id : uid(),
-        cat: CATS[o.cat] ? o.cat : "event",
-        title: o.title.trim().slice(0, 140),
-        start, end,
-        ref: typeof o.ref === "string" ? o.ref.slice(0, 200) : "",
-        notes: typeof o.notes === "string" ? o.notes.slice(0, 4000) : "",
-        approx: o.approx !== false
-      };
-    });
-  }
-
-  // ---------- helpers ----------
+  const N = STEPS.length;
+  const S = 900;               // world distance between steps
+  const STORE = "salvation-pattern-v1";
   const $ = id => document.getElementById(id);
   const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-  const toT = y => (y < 0 ? y + 1 : y); // continuous axis with no year zero
-  const fmtYear = y => (y < 0 ? `${-y} BC` : `AD ${y}`);
-  function fmtDate(it) {
-    if (it.start === null) return "Undated";
-    const c = it.approx ? "c. " : "";
-    if (it.end === null) return c + fmtYear(it.start);
-    if (it.start < 0 && it.end < 0) return `${c}${-it.start}–${-it.end} BC`;
-    if (it.start > 0 && it.end > 0) return `${c}AD ${it.start}–${it.end}`;
-    return `${c}${fmtYear(it.start)} – ${fmtYear(it.end)}`;
+  const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+  const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+
+  // ---------- saved study ----------
+  // This week's reading. Each passage opens as a study: what it says, key verses (KJV) and questions.
+  const STUDY_GROUPS = [
+    { title: "Spreuke 3 – 9", ids: ["pro3", "pro4", "pro5", "pro6", "pro7", "pro8", "pro9"] },
+    { title: "Genesis 1 & Johannes 1 · op eie tyd verder", ids: ["gen1", "jhn1"] }
+  ];
+  const PASSAGES = {
+    pro3: { ref: "Spreuke 3", en: "Proverbs 3", theme: "Trust the LORD with all your heart",
+      says: "A father urges his son to hold on to God's teaching and to mercy and truth. He calls him to trust the LORD completely rather than his own understanding, to honour God with his wealth, and to accept God's correction as a sign of love. Wisdom is worth more than silver or gold; it brings long life, peace and safe sleep. The chapter ends with practical wisdom: do good to your neighbour when you can, and do not quarrel or envy the violent.",
+      verses: [["Proverbs 3:5–6", "Trust in the LORD with all thine heart; and lean not unto thine own understanding. In all thy ways acknowledge him, and he shall direct thy paths."],
+               ["Proverbs 3:11–12", "My son, despise not the chastening of the LORD; neither be weary of his correction: for whom the LORD loveth he correcteth; even as a father the son in whom he delighteth."]],
+      questions: ["Where am I leaning on my own understanding instead of trusting God?",
+                  "What would it look like to acknowledge Him “in all thy ways” this week?",
+                  "How have I responded when God has corrected me?",
+                  "Verse 27 says not to withhold good when it is in my power to do it. Who could I do good to this week?"] },
+    pro4: { ref: "Spreuke 4", en: "Proverbs 4", theme: "Guard your heart",
+      says: "A father passes on what his own father taught him: get wisdom, whatever it costs. He sets two roads side by side. The path of the righteous grows brighter like the dawn, while the way of the wicked is deep darkness where people stumble without knowing why. He ends by telling his son to guard his heart, his mouth, his eyes and his feet.",
+      verses: [["Proverbs 4:7", "Wisdom is the principal thing; therefore get wisdom: and with all thy getting get understanding."],
+               ["Proverbs 4:18", "But the path of the just is as the shining light, that shineth more and more unto the perfect day."],
+               ["Proverbs 4:23", "Keep thy heart with all diligence; for out of it are the issues of life."]],
+      questions: ["What spiritual lessons were passed down to me, and what do I want to pass on?",
+                  "What am I letting into my heart that I need to guard against?",
+                  "Verse 26 says to ponder the path of my feet. Where is my path leading right now?",
+                  "What would getting wisdom “with all thy getting” cost me in practice?"] },
+    pro5: { ref: "Spreuke 5", en: "Proverbs 5", theme: "Sweet at first, bitter at the end",
+      says: "The father warns against the adulterous woman. Her words drip like honey and are smoother than oil, but in the end she is bitter as wormwood and her way leads to death. Keep far from her door, or you will lose your strength, your years and your honour, and regret it too late. Instead, find joy in your own wife. God sees every path, and a person's own sins become the cords that trap him.",
+      verses: [["Proverbs 5:8", "Remove thy way far from her, and come not nigh the door of her house."],
+               ["Proverbs 5:18", "Let thy fountain be blessed: and rejoice with the wife of thy youth."],
+               ["Proverbs 5:21", "For the ways of man are before the eyes of the LORD, and he pondereth all his goings."]],
+      questions: ["Which temptations in my life look sweet at first but end bitter?",
+                  "What “doors” do I need to stay well away from?",
+                  "How can I protect and celebrate faithfulness in my relationships?",
+                  "How does knowing that God sees all my ways change how I live?"] },
+    pro6: { ref: "Spreuke 6", en: "Proverbs 6", theme: "Go to the ant",
+      says: "A chapter of practical warnings. If you have rashly guaranteed someone's debt, go and humble yourself to get free. Learn from the ant, which works without a boss and stores food in summer, because laziness brings poverty. Beware of the troublemaker who stirs up strife. The LORD hates seven things, from a proud look to sowing discord among brothers. The chapter returns to the danger of adultery, which burns like fire held in your lap.",
+      verses: [["Proverbs 6:6", "Go to the ant, thou sluggard; consider her ways, and be wise."],
+               ["Proverbs 6:16–19", "These six things doth the LORD hate: yea, seven are an abomination unto him: a proud look, a lying tongue, and hands that shed innocent blood, an heart that deviseth wicked imaginations, feet that be swift in running to mischief, a false witness that speaketh lies, and he that soweth discord among brethren."]],
+      questions: ["What can I learn from the ant about diligence and planning ahead?",
+                  "What have I been putting off that I need to do?",
+                  "Which of the seven things in verses 16–19 do I need to bring to God?",
+                  "Have I made a promise or commitment that I need to put right (verses 1–5)?"] },
+    pro7: { ref: "Spreuke 7", en: "Proverbs 7", theme: "As an ox to the slaughter",
+      says: "The father tells a story. From his window he watches a young man with no sense walk at twilight toward the street where an adulterous woman lives. She meets him, kisses him and flatters him: her husband is away, come and enjoy yourself. He follows her straight away, like an ox going to the slaughter, not knowing it will cost his life. The lesson is to keep God's commands as the apple of your eye and not let your heart turn aside.",
+      verses: [["Proverbs 7:2", "Keep my commandments, and live; and my law as the apple of thine eye."],
+               ["Proverbs 7:4", "Say unto wisdom, Thou art my sister; and call understanding thy kinswoman."],
+               ["Proverbs 7:22", "He goeth after her straightway, as an ox goeth to the slaughter."]],
+      questions: ["The young man was already walking near her corner (verse 8). Where do I drift close to temptation?",
+                  "Why are flattery and smooth words so persuasive, and how do I recognise them?",
+                  "What would it mean to treat God's word as “the apple of thine eye”?",
+                  "What does calling wisdom my “sister” look like in everyday life?"] },
+    pro8: { ref: "Spreuke 8", en: "Proverbs 8", theme: "Wisdom calls out",
+      says: "Wisdom is pictured as a woman calling out in public places: at the gates, the crossroads and the city entrance. Her words are true and right, and worth more than rubies. By her kings rule and judges decide justly. She was with the LORD before the world began, beside Him as He set the heavens in place and marked out the foundations of the earth, rejoicing in His creation. Whoever finds her finds life and favour from the LORD.",
+      verses: [["Proverbs 8:11", "For wisdom is better than rubies; and all the things that may be desired are not to be compared to it."],
+               ["Proverbs 8:17", "I love them that love me; and those that seek me early shall find me."],
+               ["Proverbs 8:35", "For whoso findeth me findeth life, and shall obtain favour of the LORD."]],
+      questions: ["Wisdom calls out in busy public places (verses 1–3). Where do I hear God's wisdom calling in my daily life?",
+                  "What do I actually value more than wisdom, judging by how I spend my time?",
+                  "Verses 22–31 describe creation. What links do you see with Genesis 1 and John 1?",
+                  "What would it look like for me to “seek early”?"] },
+    pro9: { ref: "Spreuke 9", en: "Proverbs 9", theme: "Two invitations",
+      says: "Two women prepare two invitations. Wisdom has built her house with seven pillars, set her table and sends her servants to call the simple: come, eat, leave foolishness behind and live. Folly is loud and knows nothing; she sits at her door calling the same passers-by, saying stolen water is sweet. But her guests end up in the depths of the grave. In between, the chapter says a wise person welcomes correction, and that the fear of the LORD is the beginning of wisdom.",
+      verses: [["Proverbs 9:10", "The fear of the LORD is the beginning of wisdom: and the knowledge of the holy is understanding."],
+               ["Proverbs 9:8", "Reprove not a scorner, lest he hate thee: rebuke a wise man, and he will love thee."],
+               ["Proverbs 9:17", "Stolen waters are sweet, and bread eaten in secret is pleasant."]],
+      questions: ["Wisdom and Folly call the same people with almost the same words (verses 4 and 16). How can I tell which voice I am listening to?",
+                  "How do I usually respond when someone corrects me?",
+                  "What does “the fear of the LORD” mean to me?",
+                  "Why do “stolen waters” taste sweet, and what do they really cost?"] },
+    gen1: { ref: "Genesis 1", en: "Genesis 1", theme: "In the beginning God created",
+      says: "In the beginning God creates the heavens and the earth. Over six days He speaks and it is done: light; the sky; dry land, seas and plants; the sun, moon and stars; fish and birds; and land animals. Last of all He makes humankind, male and female, in His own image, blesses them, and gives them the care of the earth. God sees everything He has made, and it is very good.",
+      verses: [["Genesis 1:1", "In the beginning God created the heaven and the earth."],
+               ["Genesis 1:3", "And God said, Let there be light: and there was light."],
+               ["Genesis 1:27", "So God created man in his own image, in the image of God created he him; male and female created he them."],
+               ["Genesis 1:31", "And God saw every thing that he had made, and, behold, it was very good."]],
+      questions: ["What does Genesis 1 show me about who God is?",
+                  "What does it mean for me to be made in God's image?",
+                  "God created by speaking. What does that say about the power of His word?",
+                  "How should “very good” shape the way I see creation and other people?",
+                  "Compare Genesis 1:1–3 with John 1:1–5. What do you notice?"] },
+    jhn1: { ref: "Johannes 1", en: "John 1", theme: "The Word became flesh",
+      says: "John begins where Genesis begins: in the beginning was the Word, who was with God and was God. Everything was made through Him, and He is the light that shines in the darkness. John the Baptist comes as a witness to that light. The Word becomes flesh and lives among us, full of grace and truth. John points to Jesus as the Lamb of God who takes away the sin of the world, and the first disciples (Andrew, Simon Peter, Philip and Nathanael) are invited to “come and see”.",
+      verses: [["John 1:1", "In the beginning was the Word, and the Word was with God, and the Word was God."],
+               ["John 1:5", "And the light shineth in darkness; and the darkness comprehended it not."],
+               ["John 1:14", "And the Word was made flesh, and dwelt among us, (and we beheld his glory, the glory as of the only begotten of the Father,) full of grace and truth."],
+               ["John 1:29", "Behold the Lamb of God, which taketh away the sin of the world."]],
+      questions: ["Why do you think John calls Jesus “the Word”?",
+                  "What does it mean to me that the Word “became flesh and dwelt among us”?",
+                  "Where do I need His light to shine into a dark place in my life?",
+                  "John the Baptist pointed away from himself to Jesus. How can I do the same?",
+                  "Jesus asks, “What seek ye?” (verse 38). How would I answer Him today?",
+                  "Philip said “Come and see” (verse 46). Who could I invite?"] }
+  };
+  const readUrl = q => `https://www.biblegateway.com/passage/?search=${encodeURIComponent(q)}&version=AFR53`;
+
+  let data = { learned: {}, verses: {}, notes: {} };
+  try {
+    const raw = JSON.parse(localStorage.getItem(STORE) || "null");
+    if (raw && typeof raw === "object") data = { learned: raw.learned || {}, verses: raw.verses || {}, notes: raw.notes || {}, study: raw.study };
+  } catch (e) { /* start fresh */ }
+  const save = () => { try { localStorage.setItem(STORE, JSON.stringify(data)); } catch (e) { /* storage unavailable */ } };
+  const myVerses = i => (data.verses[i] = Array.isArray(data.verses[i]) ? data.verses[i] : []);
+  const myNotes = i => (data.notes[i] = Array.isArray(data.notes[i]) ? data.notes[i] : []);
+  const metaText = i => {
+    const v = STEPS[i].verses.length + myVerses(i).length, n = myNotes(i).length;
+    return `${v} verses${n ? ` · ${n} ${n === 1 ? "lesson" : "lessons"}` : ""}`;
+  };
+
+  const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const framed = (() => { try { return window.self !== window.top; } catch (e) { return true; } })();
+  if (framed) $("timelineLink").hidden = true;
+
+  // ---------- overview ----------
+  // ---------- passage studies ----------
+  function studyState() {
+    const st = data.study && typeof data.study === "object" ? data.study : {};
+    st.answers = st.answers || {}; st.extraQ = st.extraQ || {}; st.notes = st.notes || {};
+    st.custom = Array.isArray(st.custom) ? st.custom : [];
+    return (data.study = st);
   }
-  const matches = it => !query || (it.title + " " + it.ref + " " + it.notes + " " + CATS[it.cat]).toLowerCase().includes(query);
-  const visible = it => !hiddenCats.has(it.cat);
-  const byTime = (a, b) => toT(a.start) - toT(b.start) || (a.end === null ? 0 : 1) - (b.end === null ? 0 : 1) || a.title.localeCompare(b.title);
-
-  function ppy() { // pixels per year from the zoom slider (log scale)
-    const v = Number($("zoom").value);
-    return 0.15 * Math.pow(40, v / 100);
+  function passage(id) {
+    if (PASSAGES[id]) return { id, ...PASSAGES[id] };
+    const c = studyState().custom.find(x => x.id === id);
+    return c ? { id, ref: c.ref, en: c.ref, theme: "", says: "", verses: [], questions: [], custom: true } : null;
   }
-  function range() {
-    const dated = items.filter(i => i.start !== null);
-    if (!dated.length) return [toT(-2200), toT(100)];
-    let lo = Infinity, hi = -Infinity;
-    dated.forEach(i => { lo = Math.min(lo, toT(i.start)); hi = Math.max(hi, toT(i.end ?? i.start)); });
-    return [Math.floor((lo - 40) / 50) * 50, Math.ceil((hi + 40) / 50) * 50];
+  function questionsOf(p) {
+    const st = studyState();
+    return p.questions.map((q, n) => ({ id: "q" + n, q, mine: false }))
+      .concat((st.extraQ[p.id] || []).map(x => ({ id: x.id, q: x.q, mine: true })));
   }
-
-  // ---------- timeline ----------
-  const measure = document.createElement("canvas").getContext("2d");
-  function textW(s) {
-    measure.font = "14px Spectral, Georgia, serif";
-    return measure.measureText(s).width;
+  function answeredCount(p) {
+    const a = studyState().answers[p.id] || {};
+    return questionsOf(p).filter(q => (a[q.id] || "").trim()).length;
   }
+  const allIds = () => STUDY_GROUPS.flatMap(g => g.ids).concat(studyState().custom.map(c => c.id));
 
-  function renderTimeline() {
-    const tl = $("tl");
-    const p = ppy();
-    const [lo, hi] = range();
-    const x = y => UNDATED_W + (toT(y) - lo) * p;
-    const width = UNDATED_W + (hi - lo) * p;
-    let html = "";
-
-    // era bands
-    const eras = items.filter(i => i.cat === "era" && i.start !== null && visible(i)).sort(byTime);
-    eras.forEach(e => {
-      const l = x(e.start), w = Math.max(2, x(e.end ?? e.start) - l);
-      html += `<div class="band" style="left:${l}px;width:${w}px"><button type="button" class="band-lbl" data-id="${esc(e.id)}" title="${esc(e.title)}">${esc(e.title)}</button></div>`;
-    });
-
-    // ticks
-    const steps = [10, 25, 50, 100, 200, 250, 500, 1000];
-    const step = steps.find(s => s * p >= 72) || 1000;
-    let ticks = "";
-    for (let y = Math.ceil((lo - 1) / step) * step; y <= hi; y += step) {
-      if (y === 0) continue;
-      const t = toT(y);
-      if (t < lo || t > hi) continue;
-      ticks += `<div class="tick" style="left:${x(y)}px"><span>${fmtYear(y)}</span></div>`;
-    }
-    html += ticks;
-
-    // lanes for dated, non-era markers
-    const marks = items.filter(i => i.cat !== "era" && i.start !== null && visible(i)).sort(byTime);
-    const laneEnds = [];
-    let markHtml = "";
-    marks.forEach(m => {
-      const x1 = x(m.start);
-      const isSpan = m.end !== null && m.end !== m.start;
-      const barW = isSpan ? Math.max(6, x(m.end) - x1) : 0;
-      const labelW = textW(m.title) + (isSpan ? 14 : 22);
-      const right = x1 + Math.max(barW, labelW) + 10;
-      let lane = laneEnds.findIndex(end => end <= x1);
-      if (lane === -1) { lane = laneEnds.length; laneEnds.push(0); }
-      laneEnds[lane] = right;
-      const cls = ["mk", isSpan ? "span" : "point", m.approx ? "approx" : "", m.id === selectedId ? "sel" : "", matches(m) ? "" : "dim"].join(" ");
-      const left = isSpan ? x1 : x1 - 5.5;
-      markHtml += `<button type="button" class="${cls}" data-id="${esc(m.id)}" style="left:${left}px;top:${TOP + lane * LANE_H}px;--c:var(--c-${m.cat})" title="${esc(m.title + " · " + fmtDate(m))}">` +
-        (isSpan ? `<span class="bar" style="width:${barW}px"></span>` : `<span class="dot"></span>`) +
-        `<span class="lbl">${esc(m.title)}</span></button>`;
-    });
-
-    // undated column
-    const und = items.filter(i => i.start === null && visible(i));
-    let undHtml = `<div class="undated" style="width:${UNDATED_W}px"><div class="undated-h">Before Abraham</div><div class="undated-note">UNDATED · in story order</div></div>`;
-    und.forEach((m, i) => {
-      const cls = ["mk", "point", "approx", m.id === selectedId ? "sel" : "", matches(m) ? "" : "dim"].join(" ");
-      undHtml += `<button type="button" class="${cls}" data-id="${esc(m.id)}" style="left:14px;top:${TOP + i * LANE_H}px;--c:var(--c-${m.cat})"><span class="dot"></span><span class="lbl">${esc(m.title)}</span></button>`;
-    });
-
-    const lanes = Math.max(laneEnds.length, und.length, 3);
-    tl.style.width = Math.ceil(width) + "px";
-    tl.style.height = (TOP + lanes * LANE_H + 16) + "px";
-    tl.innerHTML = html + undHtml + markHtml;
-  }
-
-  // ---------- list ----------
-  function renderList() {
-    const list = $("list");
-    const eras = items.filter(i => i.cat === "era" && i.start !== null).sort(byTime);
-    const rows = items.filter(i => visible(i) && matches(i) && i.cat !== "era");
-    const und = rows.filter(i => i.start === null);
-    const dated = rows.filter(i => i.start !== null).sort(byTime);
-    const eraOf = it => {
-      const t = toT(it.start);
-      let found = null;
-      eras.forEach(e => { if (t >= toT(e.start) && t < toT(e.end ?? e.start)) found = e; });
-      if (!found) eras.forEach(e => { if (t === toT(e.end ?? e.start)) found = found || e; });
-      return found;
+  function renderStudies() {
+    const st = studyState();
+    const card = p => {
+      const total = questionsOf(p).length, done = answeredCount(p);
+      return `<button type="button" class="st-card" data-study="${esc(p.id)}">
+        <span class="ref">${esc(p.ref)}</span>
+        ${p.theme ? `<span class="theme">${esc(p.theme)}</span>` : `<span class="theme">Your own study</span>`}
+        <span class="bar" aria-hidden="true"><i style="width:${total ? (done / total * 100).toFixed(0) : 0}%"></i></span>
+        <span class="meta"><span>${total ? `${done} of ${total} answered` : "Add questions"}</span><span class="go">Open →</span></span>
+      </button>`;
     };
-    let html = "";
-    const row = it => `<li class="row" tabindex="0" data-id="${esc(it.id)}" style="--c:var(--c-${it.cat})">
-      <div class="d">${esc(fmtDate(it))}</div>
-      <div class="main"><div class="t">${esc(it.title)}${it.ref ? `<span class="ref">${esc(it.ref)}</span>` : ""}</div>
-      ${it.notes ? `<div class="n">${esc(it.notes)}</div>` : ""}</div></li>`;
-    if (und.length) {
-      html += `<li class="era-h">Before Abraham · undated</li>`;
-      und.forEach(it => html += row(it));
+    $("studyGroups").innerHTML = STUDY_GROUPS.map(g => `<div class="st-group"><h3>${esc(g.title)}</h3>
+        <div class="st-grid">${g.ids.map(id => card(passage(id))).join("")}</div></div>`).join("") +
+      `<div class="st-group"><h3>My passages</h3><div class="st-grid">
+        ${st.custom.map(c => card(passage(c.id))).join("")}
+        <button type="button" class="st-card add" data-act-add aria-expanded="false"><span class="ref">+ Add a passage</span><span class="theme">Carry on with Genesis 2, Johannes 2…</span></button>
+      </div>
+      <form class="add-passage" id="addPassage" hidden novalidate>
+        <input type="text" id="newRef" maxlength="60" placeholder="e.g. Genesis 2" aria-label="Passage to add">
+        <button class="btn primary" type="submit">Add passage</button>
+        <span class="saved" id="addErr" role="alert"></span>
+      </form></div>`;
+  }
+  $("studyGroups").addEventListener("click", e => {
+    const c = e.target.closest("[data-study]");
+    if (c) { openStudy(c.dataset.study); return; }
+    if (e.target.closest("[data-act-add]")) {
+      const f = $("addPassage"); f.hidden = !f.hidden;
+      e.target.closest("[data-act-add]").setAttribute("aria-expanded", String(!f.hidden));
+      if (!f.hidden) $("newRef").focus();
     }
-    let current;
-    dated.forEach(it => {
-      const e = eraOf(it);
-      const key = e ? e.id : "none";
-      if (key !== current) {
-        current = key;
-        html += `<li class="era-h">${e ? esc(e.title) + " · " + esc(fmtDate({ ...e, approx: false })) : "Outside the eras"}</li>`;
-      }
-      html += row(it);
-    });
-    list.innerHTML = html || `<li class="empty">Nothing matches. Clear the search or turn categories back on.</li>`;
-    $("count").textContent = `${rows.length} of ${items.filter(i => i.cat !== "era").length} entries · ${items.filter(i => i.cat === "era").length} eras`;
-  }
+  });
+  $("studyGroups").addEventListener("submit", e => {
+    e.preventDefault();
+    const ref = $("newRef").value.trim();
+    if (!ref) { $("addErr").textContent = "Type a passage, like Genesis 2."; return; }
+    const id = "c" + uid();
+    studyState().custom.push({ id, ref });
+    save(); renderStudies(); openStudy(id); toast("Passage added");
+  });
 
-  function renderChips() {
-    $("chips").innerHTML = Object.entries(CATS).map(([k, v]) =>
-      `<button type="button" class="chip" data-cat="${k}" aria-pressed="${!hiddenCats.has(k)}" style="--c:var(--c-${k})"><span class="sw"></span>${v}</button>`).join("");
-  }
-
-  function render() { renderTimeline(); renderList(); }
-
-  // ---------- drawer ----------
-  function openDrawer(kicker, body) {
-    $("drawerKicker").textContent = kicker;
-    $("drawerBody").innerHTML = body;
-    $("drawer").hidden = false;
-    $("scrim").hidden = false;
-  }
-  function closeDrawer() {
-    $("drawer").hidden = true;
-    $("scrim").hidden = true;
-    if (selectedId) { selectedId = null; renderTimeline(); }
-  }
-
-  function showItem(id) {
-    const it = items.find(i => i.id === id);
-    if (!it) return;
-    selectedId = id;
-    renderTimeline();
-    openDrawer(CATS[it.cat], `
-      <h3>${esc(it.title)}</h3>
-      <div class="meta"><span class="tag" style="--c:var(--c-${it.cat})"><i></i>${esc(CATS[it.cat])}</span><span>${esc(fmtDate(it))}</span>
-      ${it.end !== null ? `<span>${toT(it.end) - toT(it.start)} years</span>` : ""}</div>
-      ${it.ref ? `<div class="refline">${esc(it.ref)}</div>` : ""}
-      ${it.notes ? `<div class="notes">${esc(it.notes)}</div>` : `<div class="hint">No notes yet.</div>`}
-      <div class="btns">
-        <button type="button" class="btn" data-act="edit" data-id="${esc(it.id)}">Edit</button>
-        <button type="button" class="btn" data-act="goto" data-id="${esc(it.id)}">Show on timeline</button>
-        <button type="button" class="btn danger" data-act="delete" data-id="${esc(it.id)}">Delete</button>
-      </div>`);
-  }
-
-  function yearInputs(prefix, y) {
-    const abs = y === null || y === undefined ? "" : Math.abs(y);
-    const bc = y === null || y === undefined ? true : y < 0;
-    return `<div class="yr"><input type="number" min="1" max="9999" id="${prefix}Y" value="${abs}" inputmode="numeric">
-      <select id="${prefix}E" aria-label="BC or AD"><option value="BC"${bc ? " selected" : ""}>BC</option><option value="AD"${bc ? "" : " selected"}>AD</option></select></div>`;
-  }
-
-  function showForm(id) {
-    const it = id ? items.find(i => i.id === id) : { cat: "event", title: "", start: null, end: null, ref: "", notes: "", approx: true };
-    if (!it) return;
-    const undated = id ? it.start === null : false;
-    openDrawer(id ? "Edit entry" : "Add to timeline", `
-      <form class="edit" id="editForm" novalidate data-id="${id ? esc(id) : ""}">
-        <div class="field"><label for="fTitle">Title</label><input type="text" id="fTitle" required maxlength="140" value="${esc(it.title)}" placeholder="e.g. Ruth meets Boaz"></div>
-        <div class="field"><label for="fCat">Kind</label><select id="fCat">${Object.entries(CATS).map(([k, v]) => `<option value="${k}"${k === it.cat ? " selected" : ""}>${v}</option>`).join("")}</select>
-          <span class="hint">Eras draw as background bands. Give them a start and end year.</span></div>
-        <div class="two">
-          <div class="field"><label for="fStartY">Year (or start)</label>${yearInputs("fStart", it.start)}</div>
-          <div class="field"><label for="fEndY">End year (optional)</label>${yearInputs("fEnd", it.end)}</div>
+  let openStudyId = null, saveT = 0;
+  function openStudy(id) {
+    const p = passage(id);
+    if (!p) return;
+    openStep = null; openStudyId = id;
+    const st = studyState(), ans = st.answers[id] || {}, qs = questionsOf(p);
+    const ids = allIds(), at = ids.indexOf(id);
+    $("paper").innerHTML = `
+      <div class="sheet-h">
+        <span class="num" aria-hidden="true">${ICONS.book}</span>
+        <div><div class="kicker">Week se leeswerk</div><h2 id="sheetTitle">${esc(p.ref)}</h2>${p.theme ? `<div style="font-style:italic">${esc(p.theme)}</div>` : ""}</div>
+        <button type="button" class="x" data-act="close" aria-label="Close">×</button>
+      </div>
+      <div class="sheet-b">
+        <h4>What it says</h4>
+        ${p.says ? `<p class="lesson">${esc(p.says)}</p>` : `<p class="empty">Read the passage, then sum it up in your own words in “My notes” below.</p>`}
+        <p style="margin:4px 0 0"><a href="${readUrl(p.en)}" target="_blank" rel="noopener">Read ${esc(p.ref)} in full (Afrikaans 1933/53) →</a></p>
+        ${p.verses.length ? `<h4>Key verses</h4>${p.verses.map(([r, t]) => `<blockquote class="scripture"><p>“${esc(t)}”</p><cite>${esc(r)} · KJV</cite></blockquote>`).join("")}` : ""}
+        <h4>Questions to think about</h4>
+        ${qs.length ? qs.map((q, n) => `<div class="qa">
+            <div class="q"><span class="n">${n + 1}.</span><span>${esc(q.q)}</span></div>
+            <label class="mine-tag" for="ans-${esc(q.id)}">Your answer${q.mine ? " · your own question" : ""}</label>
+            <textarea id="ans-${esc(q.id)}" data-q="${esc(q.id)}" maxlength="6000" placeholder="Write your answer…">${esc(ans[q.id] || "")}</textarea>
+            <div class="row"><span class="saved" data-saved="${esc(q.id)}"></span>${q.mine ? `<button type="button" class="del" data-act="delQ" data-id="${esc(q.id)}">Remove question</button>` : ""}</div>
+          </div>`).join("") : `<p class="empty">No questions yet. Add your own below.</p>`}
+        <form class="add" id="qForm" novalidate>
+          <input type="text" id="newQ" maxlength="400" placeholder="Add your own question" aria-label="Your own question">
+          <div class="row"><button class="btn" type="submit">Add question</button><span class="err" id="qErr" role="alert"></span></div>
+        </form>
+        <h4>My notes</h4>
+        <textarea class="study-notes" id="studyNotes" data-notes maxlength="10000" placeholder="Anything else that stood out to you">${esc(st.notes[id] || "")}</textarea>
+        <span class="saved" data-saved="notes"></span>
+        <div class="sheet-f">
+          <span style="display:flex;gap:8px;flex-wrap:wrap">
+            ${at > 0 ? `<button type="button" class="btn" data-act="sprev">← ${esc(passage(ids[at - 1]).ref)}</button>` : ""}
+            ${at < ids.length - 1 ? `<button type="button" class="btn" data-act="snext">${esc(passage(ids[at + 1]).ref)} →</button>` : ""}
+          </span>
+          ${p.custom ? `<button type="button" class="btn danger" data-act="delPassage">Remove passage</button>` : ""}
         </div>
-        <label class="check"><input type="checkbox" id="fApprox"${it.approx ? " checked" : ""}> Date is approximate</label>
-        <label class="check"><input type="checkbox" id="fUndated"${undated ? " checked" : ""}> No date (place in the undated column)</label>
-        <div class="field"><label for="fRef">Scripture reference</label><input type="text" id="fRef" maxlength="200" value="${esc(it.ref)}" placeholder="e.g. Ruth 2"></div>
-        <div class="field"><label for="fNotes">Notes</label><textarea id="fNotes" maxlength="4000" placeholder="What happened, why it matters, cross-references…">${esc(it.notes)}</textarea></div>
-        <div class="err" id="fErr" role="alert"></div>
-        <div class="btns"><button class="btn primary" type="submit">${id ? "Save changes" : "Add to timeline"}</button><button class="btn" type="button" data-act="cancel">Cancel</button></div>
-      </form>`);
-    syncUndated();
-    $("fTitle").focus();
+      </div>`;
+    const sh = $("sheet");
+    if (sh.hidden) { sh.classList.remove("unroll"); void sh.offsetWidth; if (!reduced) sh.classList.add("unroll"); }
+    sh.hidden = false; $("scrim").hidden = false;
+    $("paper").scrollTop = 0;
+    stopWalk();
+    document.body.style.overflow = "hidden";
+    sh.querySelector(".x").focus({ preventScroll: true });
   }
-  function syncUndated() {
-    const u = $("fUndated");
-    if (!u) return;
-    ["fStartY", "fStartE", "fEndY", "fEndE"].forEach(k => { $(k).disabled = u.checked; });
-  }
-  function readYear(prefix) {
-    const raw = $(prefix + "Y").value.trim();
-    if (!raw) return null;
-    const n = Math.round(Number(raw));
-    if (!isFinite(n) || n < 1) return NaN;
-    return $(prefix + "E").value === "BC" ? -n : n;
-  }
-  function submitForm(form) {
-    const err = $("fErr");
-    const title = $("fTitle").value.trim();
-    if (!title) { err.textContent = "Give the entry a title."; $("fTitle").focus(); return; }
-    const undated = $("fUndated").checked;
-    let start = undated ? null : readYear("fStart");
-    let end = undated ? null : readYear("fEnd");
-    if (Number.isNaN(start) || Number.isNaN(end)) { err.textContent = "Years must be whole numbers of 1 or more."; return; }
-    if (!undated && start === null) { err.textContent = "Enter a year, or tick “No date”."; $("fStartY").focus(); return; }
-    if (end !== null && toT(end) < toT(start)) { err.textContent = "The end year comes before the start year. Check BC/AD."; return; }
-    if (end === start) end = null;
-    const cat = $("fCat").value;
-    if (cat === "era" && (start === null || end === null)) { err.textContent = "An era needs both a start and an end year."; return; }
-    const data = { title, cat, start, end, approx: $("fApprox").checked, ref: $("fRef").value.trim(), notes: $("fNotes").value.trim() };
-    const id = form.dataset.id;
-    if (id) Object.assign(items.find(i => i.id === id), data);
-    else items.push({ id: uid(), ...data });
-    save();
-    hiddenCats.delete(cat);
-    renderChips();
-    render();
-    const newId = id || items[items.length - 1].id;
-    showItem(newId);
-    scrollToItem(newId);
-    toast(id ? "Changes saved" : "Added to the timeline");
-  }
-
-  function scrollToItem(id) {
-    const el = $("tl").querySelector(`.mk[data-id="${CSS.escape(id)}"], .band-lbl[data-id="${CSS.escape(id)}"]`);
-    if (!el) return;
-    const sc = $("tlScroll");
-    const box = el.getBoundingClientRect(), sb = sc.getBoundingClientRect();
-    sc.scrollTo({ left: sc.scrollLeft + box.left - sb.left - sb.width / 3, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
-    $("tlScroll").parentElement.scrollIntoView({ block: "nearest" });
-  }
-
-  function showData() {
-    const framed = (() => { try { return window.self !== window.top; } catch (e) { return true; } })();
-    openDrawer("Save & share", `
-      <h3>Your timeline</h3>
-      <p class="hint" style="margin:0">Changes save automatically in this browser. To move your timeline to another device or share it, copy this text (or download it) and load it there.</p>
-      <textarea class="json" id="jsonOut" readonly aria-label="Timeline data">${esc(JSON.stringify({ app: "bible-timeline", version: 1, items }, null, 1))}</textarea>
-      <div class="btns">
-        <button type="button" class="btn primary" data-act="copy">Copy timeline</button>
-        ${framed ? "" : `<button type="button" class="btn" data-act="download">Download .json</button>`}
-      </div>
-      <div class="field"><span class="lab">Load a timeline</span>
-        <textarea class="json" id="jsonIn" style="min-height:110px" placeholder="Paste timeline text here, or choose a file below" aria-label="Paste timeline data"></textarea>
-        <input type="file" id="fileIn" accept=".json,application/json">
-      </div>
-      <div class="err" id="dErr" role="alert"></div>
-      <div class="btns">
-        <button type="button" class="btn" data-act="import">Replace with pasted timeline</button>
-        <button type="button" class="btn danger" data-act="reset">Reset to the sample timeline</button>
-      </div>`);
-  }
-
-  function armOrRun(btn, label, fn) {
-    if (btn.classList.contains("armed")) { fn(); return; }
-    btn.classList.add("armed");
-    const old = btn.textContent;
-    btn.textContent = label;
-    setTimeout(() => { if (btn.isConnected) { btn.classList.remove("armed"); btn.textContent = old; } }, 4000);
-  }
-
-  let toastTimer;
-  function toast(msg) {
-    const t = $("toast");
-    t.textContent = msg; t.hidden = false;
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => { t.hidden = true; }, 2200);
-  }
-
-  // ---------- events ----------
-  $("tl").addEventListener("click", e => {
-    const b = e.target.closest("[data-id]");
-    if (b) showItem(b.dataset.id);
-  });
-  $("list").addEventListener("click", e => {
-    const r = e.target.closest("[data-id]");
-    if (r) showItem(r.dataset.id);
-  });
-  $("list").addEventListener("keydown", e => {
-    const r = e.target.closest("[data-id]");
-    if (r && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); showItem(r.dataset.id); }
-  });
-  $("chips").addEventListener("click", e => {
-    const c = e.target.closest("[data-cat]");
-    if (!c) return;
-    const k = c.dataset.cat;
-    hiddenCats.has(k) ? hiddenCats.delete(k) : hiddenCats.add(k);
-    renderChips(); render();
-  });
-  $("q").addEventListener("input", e => { query = e.target.value.trim().toLowerCase(); render(); });
-  $("zoom").addEventListener("input", () => {
-    const sc = $("tlScroll");
-    const before = (sc.scrollLeft + sc.clientWidth / 2 - UNDATED_W) / ppy.last;
-    renderTimeline();
-    ppy.last = ppy();
-    sc.scrollLeft = Math.max(0, before * ppy.last + UNDATED_W - sc.clientWidth / 2);
-  });
-  $("addBtn").addEventListener("click", () => showForm(null));
-  $("dataBtn").addEventListener("click", showData);
-  $("closeBtn").addEventListener("click", closeDrawer);
-  $("scrim").addEventListener("click", closeDrawer);
-  document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("drawer").hidden) closeDrawer(); });
-
-  $("drawerBody").addEventListener("change", e => {
-    if (e.target.id === "fUndated") syncUndated();
-    if (e.target.id === "fileIn" && e.target.files[0]) {
-      const r = new FileReader();
-      r.onload = () => { $("jsonIn").value = String(r.result); $("dErr").textContent = "File loaded. Press “Replace with pasted timeline” to use it."; };
-      r.readAsText(e.target.files[0]);
-    }
-  });
-  $("drawerBody").addEventListener("submit", e => { e.preventDefault(); submitForm(e.target); });
-  $("drawerBody").addEventListener("click", e => {
+  function studyClick(e) {
     const b = e.target.closest("[data-act]");
     if (!b) return;
-    const act = b.dataset.act, id = b.dataset.id;
-    if (act === "edit") showForm(id);
-    else if (act === "cancel") { const fid = $("editForm").dataset.id; fid ? showItem(fid) : closeDrawer(); }
-    else if (act === "goto") { scrollToItem(id); }
-    else if (act === "delete") armOrRun(b, "Tap again to delete", () => {
-      items = items.filter(i => i.id !== id); save(); closeDrawer(); render(); toast("Deleted");
+    const id = openStudyId, act = b.dataset.act, ids = allIds(), at = ids.indexOf(id);
+    if (act === "close") closeSheet();
+    else if (act === "sprev") openStudy(ids[at - 1]);
+    else if (act === "snext") openStudy(ids[at + 1]);
+    else if (act === "delQ") arm(b, "Tap to confirm", () => {
+      const st = studyState();
+      st.extraQ[id] = (st.extraQ[id] || []).filter(x => x.id !== b.dataset.id);
+      if (st.answers[id]) delete st.answers[id][b.dataset.id];
+      save(); openStudy(id); toast("Question removed");
     });
-    else if (act === "copy") {
-      const ta = $("jsonOut");
-      const fallback = () => { ta.focus(); ta.select(); toast("Selected. Press Ctrl+C or ⌘C to copy"); };
-      try { navigator.clipboard.writeText(ta.value).then(() => toast("Timeline copied"), fallback); } catch (err) { fallback(); }
-    }
-    else if (act === "download") {
-      const blob = new Blob([$("jsonOut").value], { type: "application/json" });
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob); a.download = "bible-timeline.json";
-      document.body.appendChild(a); a.click(); a.remove();
-      setTimeout(() => URL.revokeObjectURL(a.href), 1000);
-    }
-    else if (act === "import") {
-      let parsed;
-      try { parsed = normalize(JSON.parse($("jsonIn").value)); } catch (err) { parsed = null; }
-      if (!parsed || !parsed.length) { $("dErr").textContent = "That text isn't a timeline. Paste the full text copied from “Copy timeline”."; return; }
-      armOrRun(b, `Tap again to replace with ${parsed.length} entries`, () => {
-        items = parsed; save(); closeDrawer(); render(); toast("Timeline loaded");
-      });
-    }
-    else if (act === "reset") armOrRun(b, "Tap again to erase your changes", () => {
-      items = clone(SAMPLE); save(); closeDrawer(); render(); toast("Sample timeline restored");
+    else if (act === "delPassage") arm(b, "Tap again to remove", () => {
+      const st = studyState();
+      st.custom = st.custom.filter(c => c.id !== id);
+      delete st.answers[id]; delete st.extraQ[id]; delete st.notes[id];
+      save(); closeSheet(); toast("Passage removed");
     });
+  }
+  function studySubmit(e) {
+    if (e.target.id !== "qForm") return;
+    const q = $("newQ").value.trim();
+    if (!q) { $("qErr").textContent = "Type a question first."; return; }
+    const st = studyState();
+    (st.extraQ[openStudyId] = st.extraQ[openStudyId] || []).push({ id: "m" + uid(), q });
+    save(); openStudy(openStudyId); toast("Question added");
+  }
+  // answers and notes save as you type
+  $("paper").addEventListener("input", e => {
+    if (openStudyId === null) return;
+    const st = studyState(), t = e.target;
+    let key;
+    if (t.dataset.q) { (st.answers[openStudyId] = st.answers[openStudyId] || {})[t.dataset.q] = t.value; key = t.dataset.q; }
+    else if (t.dataset.notes !== undefined) { st.notes[openStudyId] = t.value; key = "notes"; }
+    else return;
+    const tag = $("paper").querySelector(`[data-saved="${CSS.escape(key)}"]`);
+    if (tag) tag.textContent = "Saving…";
+    clearTimeout(saveT);
+    saveT = setTimeout(() => { save(); if (tag && tag.isConnected) tag.textContent = "Saved"; }, 400);
   });
 
+  function renderOverview() {
+    $("ovList").innerHTML = STEPS.map((s, i) => `<li><button type="button" class="ov-item" data-step="${i}">
+      <span class="num">${i + 1}</span>
+      <span class="txt"><span class="h">${esc(s.name)}</span><span class="sub">${esc(s.sub)}</span>
+        <span class="meta">${metaText(i)}${data.learned[i] ? ' · <span class="done">✓ Learned</span>' : ""}</span></span>
+      <span class="ico" aria-hidden="true">${ICONS[s.icon]}</span></button></li>`).join("");
+    const done = STEPS.filter((_, i) => data.learned[i]).length;
+    $("progress").textContent = done ? `${done} of ${N} steps marked learned` : "Open a step to begin";
+  }
+
+  // ---------- 3D journey ----------
+  const world = $("world");
+  let A = 200, vh = 800, stepPx = 700, floorY = 240, floorSegs = [], cards = [], cross, halo, hill;
+  const FW = 2400, Z0 = 1400, SEG = 1800;
+  const FL = Z0 + (N + 1) * S + 2600;
+  const CROSS_Z = -((N + 1) * S + 1500);
+  const pathX = t => A * Math.sin(t * 1.15 - 0.3);
+  const pathDX = t => A * 1.15 * Math.cos(t * 1.15 - 0.3);
+
+  // ---------- clouds ----------
+  function rng(seed) { return () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+  const CLOUDS = (() => {
+    const r = rng(11), out = [];
+    for (let n = 0; n < 26; n++) {
+      const w = 900 + r() * 1000, h = w * (0.4 + r() * 0.16);
+      const t = -0.5 + r() * (N + 2.4);
+      const kind = n % 3; // 0 overhead, 1 beside the road, 2 a sea of cloud below it
+      const side = r() < 0.5 ? -1 : 1;
+      const off = kind === 0 ? (r() - 0.5) * 1800 : side * (w / 2 + 240 + r() * 600);
+      const y = kind === 0 ? -(520 + r() * 700) - h : kind === 1 ? -(h * 0.75) - r() * 220 : 60 + r() * 220;
+      out.push({ w, h, t, off: kind === 2 ? (r() - 0.5) * 2200 : off, y, low: kind === 2, zj: -240 - r() * 420, seed: Math.floor(r() * 1e9), sway: 40 + r() * 120, speed: 0.04 + r() * 0.1, phase: r() * 6.28 });
+    }
+    return out;
+  })();
+  let cloudEls = [];
+  function fade(c, a) { // same colour, new alpha, so soft edges never turn grey
+    const m = /^#?([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i.exec(c.trim());
+    return m ? `rgba(${parseInt(m[1], 16)}, ${parseInt(m[2], 16)}, ${parseInt(m[3], 16)}, ${a})` : `rgba(255, 255, 255, ${a})`;
+  }
+  // storm-dark bodies, cool shadows underneath, sunlit rims on top, like clouds around an opening of light
+  function paintCloud(cv, w, h, seed, k) {
+    cv.width = Math.round(w * k); cv.height = Math.round(h * k);
+    cv.style.width = w + "px"; cv.style.height = h + "px";
+    const g = cv.getContext("2d"), r = rng(seed);
+    g.scale(k, k);
+    const puff = (x, y, rad, c, a) => {
+      const gr = g.createRadialGradient(x, y, 0, x, y, rad);
+      gr.addColorStop(0, fade(c, 1)); gr.addColorStop(0.55, fade(c, 0.6)); gr.addColorStop(1, fade(c, 0));
+      g.globalAlpha = a; g.fillStyle = gr; g.beginPath(); g.arc(x, y, rad, 0, Math.PI * 2); g.fill();
+    };
+    const puffs = [];
+    for (let n = 0; n < 34; n++) {
+      const x = w * (0.1 + r() * 0.8);
+      const bump = Math.sin(((x / w) - 0.12) / 0.76 * Math.PI);
+      const rad = h * (0.12 + r() * 0.2) * (0.6 + bump * 0.75);
+      puffs.push([x, h * 0.7 - bump * h * 0.26 - r() * h * 0.1, rad]);
+    }
+    puffs.forEach(([x, y, rad]) => puff(x, y + rad * 0.35, rad * 1.1, "#2a2a33", 0.32));
+    puffs.forEach(([x, y, rad]) => puff(x, y, rad, "#6f5f5a", 0.42));
+    puffs.forEach(([x, y, rad]) => puff(x - rad * 0.1, y - rad * 0.4, rad * 0.6, "#f4dcbd", 0.38));
+    g.globalAlpha = 1;
+  }
+  function paintClouds() {
+    cloudEls.forEach((cv, n) => { const c = CLOUDS[n]; paintCloud(cv, c.w, c.h, c.seed, 0.3); });
+  }
+  function updateClouds(p, camX, camZ, time) {
+    cloudEls.forEach((cv, n) => {
+      const c = CLOUDS[n];
+      const z = -c.t * S + c.zj + camZ;
+      const x = pathX(c.t) + c.off + Math.sin(time * c.speed + c.phase) * c.sway - camX;
+      let op = 1;
+      if (z > -220) op = 1 - (z + 220) / 420;
+      else if (z < -6500) op = 1 - (-z - 6500) / 1500;
+      op = clamp(op, 0, 1) * (c.low ? 0.6 : 0.9);
+      place(cv, x - c.w / 2, c.low ? floorY + c.y : c.y, z, "");
+      cv.style.opacity = op.toFixed(3);
+      cv.style.visibility = op < 0.02 ? "hidden" : "visible";
+    });
+    // the sky photo drifts closer to the light as you walk; the rays sway slowly
+    $("skyPhoto").style.transform = `scale(${(1.04 + p * 0.07 + Math.sin(time * 0.05) * 0.01).toFixed(4)}) translateX(${(Math.sin(time * 0.03) * 8).toFixed(1)}px)`;
+    $("rays").style.transform = `rotate(${(Math.sin(time * 0.12) * 2.5).toFixed(2)}deg)`;
+    $("rays").style.opacity = (0.55 + 0.35 * p / (N + 1) + Math.sin(time * 0.5) * 0.08).toFixed(3);
+  }
+
+  function buildWorld() {
+    let html = "";
+    for (let j = 0; j * SEG < FL; j++) html += `<canvas class="floor" data-seg="${j}" aria-hidden="true"></canvas>`;
+    html += `<div class="hill" id="hill"></div><div class="halo" id="halo"></div>
+      <div class="cross3d" id="cross3d" aria-hidden="true"><svg viewBox="0 0 100 160"><defs><linearGradient id="wood" x1="0" x2="1"><stop offset="0" stop-color="#7a5530"/><stop offset=".5" stop-color="#9b7246"/><stop offset="1" stop-color="#6a4826"/></linearGradient></defs>
+      <rect x="43" y="0" width="14" height="160" rx="2" fill="url(#wood)"/><rect x="14" y="34" width="72" height="13" rx="2" fill="url(#wood)"/></svg></div>`;
+    html += STEPS.map((s, i) => `<button type="button" class="card" data-step="${i}" aria-label="Step ${i + 1}: ${esc(s.name)}. ${esc(s.sub)}. Open this step.">
+      <span class="num">${i + 1}</span>
+      <span class="txt"><span class="h">${esc(s.name)}</span><span class="sub">${esc(s.sub)}</span></span>
+      <span class="ico" aria-hidden="true">${ICONS[s.icon]}</span>
+      <span class="verse">“${esc(shortVerse(s.verses[0][1]))}” <b>${esc(s.verses[0][0])}</b></span>
+      <span class="foot"><span class="meta" data-meta="${i}"></span><span class="open">Open step →</span></span>
+    </button>`).join("");
+    html += CLOUDS.map((c, n) => `<canvas class="cloud" data-cloud="${n}" aria-hidden="true"></canvas>`).join("");
+    world.innerHTML = html;
+    cloudEls = [...world.querySelectorAll(".cloud")];
+    floorSegs = [...world.querySelectorAll(".floor")];
+    cards = [...world.querySelectorAll(".card")];
+    cross = $("cross3d"); halo = $("halo"); hill = $("hill");
+  }
+  function shortVerse(t) {
+    const words = t.split(" ");
+    return words.length > 16 ? words.slice(0, 15).join(" ").replace(/[,;:]$/, "") + " …" : t;
+  }
+  function refreshCardMeta() {
+    cards.forEach((c, i) => {
+      const m = c.querySelector("[data-meta]");
+      m.innerHTML = data.learned[i] ? `<span class="done">✓ Learned</span> · ${metaText(i)}` : metaText(i);
+    });
+  }
+
+  function drawFloor() {
+    const k = 0.35;
+    floorSegs.forEach((cv, j) => {
+      const v0 = j * SEG, len = Math.min(SEG, FL - v0);
+      cv.width = Math.round(FW * k); cv.height = Math.round(len * k);
+      cv.style.width = FW + "px"; cv.style.height = len + "px";
+      const g = cv.getContext("2d");
+      g.setTransform(k, 0, 0, k, 0, -v0 * k);
+      // a glowing road of light through the clouds
+      const pts = [];
+      for (let v = v0 - 60; v <= v0 + len + 60; v += 20) pts.push([pathX((v - Z0) / S) + FW / 2, v]);
+      const stroke = (w, c, a) => {
+        g.beginPath(); pts.forEach(([u, v], n) => n ? g.lineTo(u, v) : g.moveTo(u, v));
+        g.lineWidth = w; g.strokeStyle = c; g.globalAlpha = a; g.lineCap = "round"; g.lineJoin = "round"; g.stroke(); g.globalAlpha = 1;
+      };
+      g.shadowColor = "rgba(255, 226, 180, 0.9)"; g.shadowBlur = 30;
+      stroke(360, "rgba(255, 226, 186, 0.16)", 1);
+      g.shadowBlur = 0;
+      stroke(240, "rgba(255, 236, 206, 0.32)", 1);
+      stroke(100, "rgba(255, 247, 232, 0.28)", 1);
+      // footprints, alternating left and right
+      g.fillStyle = "#fff3dc";
+      let side = 1;
+      for (let t = 0.1; t < N + 1.4; t += 0.16, side = -side) {
+        const v = Z0 + t * S;
+        if (v < v0 - 40 || v > v0 + len + 40) continue;
+        const u = pathX(t) + FW / 2 + side * 22;
+        const ang = -Math.atan(pathDX(t) / S);
+        g.save(); g.translate(u, v); g.rotate(ang); g.globalAlpha = 0.6;
+        g.beginPath(); g.ellipse(0, 6, 8, 16, 0, 0, Math.PI * 2); g.fill();          // sole
+        g.beginPath(); g.ellipse(0, -16, 6.5, 8, 0, 0, Math.PI * 2); g.fill();       // heel (toward the walker)
+        for (let n = 0; n < 4; n++) { g.beginPath(); g.arc(-6 + n * 4, 26 + Math.abs(n - 1.5), 2.2, 0, Math.PI * 2); g.fill(); }
+        g.restore();
+      }
+    });
+  }
+
+  function layout() {
+    if (reduced) return;
+    vh = window.innerHeight;
+    stepPx = Math.round(vh * 0.85);
+    A = Math.min(window.innerWidth * 0.2, 200);
+    floorY = Math.min(260, vh * 0.36);
+    const j = $("journey");
+    j.style.height = ((N + 1) * stepPx + vh) + "px";
+    j.querySelectorAll(".snap").forEach(n => n.remove());
+    for (let T = 0; T <= N + 1; T++) {
+      const m = document.createElement("span");
+      m.className = "snap"; m.style.top = (T * stepPx) + "px";
+      j.appendChild(m);
+    }
+    drawFloor();
+    update();
+  }
+
+  const journeyTop = () => $("journey").getBoundingClientRect().top + window.scrollY;
+  function progress() { return clamp((window.scrollY - journeyTop()) / stepPx, 0, N + 1); }
+
+  function place(el, x, y, z, extra) {
+    el.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, ${z.toFixed(1)}px)${extra || ""}`;
+  }
+
+  function update() {
+    const p = progress();
+    const camX = pathX(p);
+    const camZ = p * S;
+    // floor segments
+    floorSegs.forEach((cv, j) => place(cv, -FW / 2 - camX, floorY, Z0 - j * SEG + camZ, " rotateX(-90deg)"));
+    // cards
+    cards.forEach((c, i) => {
+      const T = i + 1;
+      const x = pathX(T) - camX, z = (p - T) * S;
+      let op = 1;
+      if (z > 0) op = 1 - z / 380;
+      else if (z < -1900) op = 1 - (-z - 1900) / 900;
+      op = clamp(op, 0, 1);
+      const w = c.offsetWidth, h = c.offsetHeight;
+      place(c, x - w / 2, -h / 2 - 40, z, ` rotateY(${clamp(-x * 0.035, -16, 16).toFixed(2)}deg)`);
+      c.style.opacity = op.toFixed(3);
+      c.style.visibility = op < 0.03 ? "hidden" : "visible";
+      c.style.pointerEvents = op < 0.5 ? "none" : "auto";
+    });
+    // the cross on its hill at the end of the road
+    const cx = pathX(N + 1) - camX, cz = CROSS_Z + camZ;
+    const CH = 900, CW = 560;
+    place(cross, cx - CW / 2, floorY - CH, cz, "");
+    cross.style.width = CW + "px"; cross.style.height = CH + "px";
+    place(halo, cx - 1100, floorY - CH - 700, cz - 40, "");
+    halo.style.width = halo.style.height = "2200px";
+    place(hill, cx - 1600, floorY - 420, cz + 80, "");
+    hill.style.width = "3200px"; hill.style.height = "700px";
+    updateClouds(p, camX, camZ, performance.now() / 1000);
+    // overlays
+    const heroOp = clamp(1 - p * 1.8, 0, 1);
+    $("hero").style.opacity = heroOp; $("hero").style.visibility = heroOp < 0.02 ? "hidden" : "visible";
+    $("hint").style.opacity = clamp(1 - p * 3, 0, 1);
+    $("finale").hidden = p < N + 0.55;
+    $("finale").style.opacity = clamp((p - (N + 0.55)) * 2.5, 0, 1);
+    $("sun").style.opacity = (0.45 + 0.55 * p / (N + 1)).toFixed(3);
+    // rail
+    const cur = Math.round(p) - 1;
+    $("rail").querySelectorAll("button").forEach((b, i) => b.classList.toggle("on", i === cur));
+    const past = window.scrollY > journeyTop() + (N + 1) * stepPx + vh * 0.5;
+    $("rail").classList.toggle("away", past);
+    $("walkBtn").classList.toggle("away", past || (p > N + 0.5 && !walking));
+  }
+
+  function renderRail() {
+    $("rail").innerHTML = STEPS.map((s, i) => `<button type="button" data-go="${i + 1}" class="${data.learned[i] ? "learned" : ""}" aria-label="Go to step ${i + 1}: ${esc(s.name)}" title="${esc(s.name)}">${i + 1}</button>`).join("") +
+      `<button type="button" data-go="${N + 1}" aria-label="Go to the cross" title="The cross">✝</button>`;
+  }
+  function goTo(T) {
+    window.scrollTo({ top: journeyTop() + T * stepPx, behavior: reduced ? "auto" : "smooth" });
+  }
+
+  // ---------- walk the path for me ----------
+  let walking = false, walkTimer = 0;
+  function setWalkLabel() {
+    const b = $("walkBtn");
+    b.textContent = walking ? "❚❚ Pause" : (progress() >= N + 0.9 ? "↺ Walk again" : "▶ Walk the path");
+    b.setAttribute("aria-pressed", String(walking));
+  }
+  function walkStep() {
+    if (!walking) return;
+    const next = Math.floor(progress() + 0.05) + 1;
+    if (next > N + 1) { stopWalk(); return; }
+    goTo(next);
+    walkTimer = setTimeout(next >= N + 1 ? stopWalk : walkStep, next >= N + 1 ? 1600 : 4200);
+  }
+  function startWalk() {
+    if (progress() >= N + 0.9) window.scrollTo({ top: journeyTop(), behavior: "auto" });
+    walking = true; setWalkLabel();
+    walkTimer = setTimeout(walkStep, 250);
+  }
+  function stopWalk() { walking = false; clearTimeout(walkTimer); setWalkLabel(); }
+  $("walkBtn").addEventListener("click", () => walking ? stopWalk() : startWalk());
+  ["wheel", "touchstart", "keydown"].forEach(ev => window.addEventListener(ev, e => {
+    if (walking && !(e.type === "keydown" && e.target === $("walkBtn"))) stopWalk();
+  }, { passive: true }));
+
+  // ---------- study sheet ----------
+  let openStep = null;
+  function openSheet(i) {
+    openStudyId = null;
+    openStep = i;
+    const s = STEPS[i];
+    const mv = myVerses(i), mn = myNotes(i);
+    $("paper").innerHTML = `
+      <div class="sheet-h">
+        <span class="num">${i + 1}</span>
+        <div><div class="kicker">Step ${i + 1} of ${N}</div><h2 id="sheetTitle">${esc(s.name)}</h2><div style="font-style:italic">${esc(s.sub)}</div></div>
+        <button type="button" class="x" data-act="close" aria-label="Close">×</button>
+      </div>
+      <div class="sheet-b">
+        <h4>Scripture</h4>
+        ${s.verses.map(([r, t]) => `<blockquote class="scripture"><p>“${esc(t)}”</p><cite>${esc(r)} · KJV</cite></blockquote>`).join("")}
+        <h4>What we've learned</h4>
+        <p class="lesson">${esc(s.lesson)}</p>
+        <h4>Live it out</h4>
+        <ol class="steps">${s.live.map(l => `<li>${esc(l)}</li>`).join("")}</ol>
+
+        <h4>My verses</h4>
+        <div class="mine">${mv.length ? mv.map(v => `<div class="entry"><div class="body"><span class="r">${esc(v.ref)}</span>${esc(v.text)}</div>
+          <button type="button" class="del" data-act="delVerse" data-id="${esc(v.id)}">Remove</button></div>`).join("") : `<p class="empty">Add a verse that speaks to you about this step.</p>`}</div>
+        <form class="add" id="verseForm" novalidate>
+          <input type="text" id="vRef" maxlength="80" placeholder="Reference, e.g. Psalm 119:105" aria-label="Verse reference">
+          <textarea id="vText" maxlength="2000" placeholder="Verse text (any translation)" aria-label="Verse text"></textarea>
+          <div class="row"><button class="btn" type="submit">Add verse</button><span class="err" id="vErr" role="alert"></span></div>
+        </form>
+
+        <h4>What I've learned</h4>
+        <div class="mine">${mn.length ? mn.map(n => `<div class="entry"><div class="body">${esc(n.text)}<span class="when">${esc(n.date)}</span></div>
+          <button type="button" class="del" data-act="delNote" data-id="${esc(n.id)}">Remove</button></div>`).join("") : `<p class="empty">Write down what God is teaching you here and how you will apply it.</p>`}</div>
+        <form class="add" id="noteForm" novalidate>
+          <textarea id="nText" maxlength="4000" placeholder="What I learned, and what I'll do about it" aria-label="What I've learned"></textarea>
+          <div class="row"><button class="btn" type="submit">Save lesson</button><span class="err" id="nErr" role="alert"></span></div>
+        </form>
+
+        <div class="sheet-f">
+          <button type="button" class="btn ${data.learned[i] ? "" : "primary"}" data-act="learned" aria-pressed="${!!data.learned[i]}">${data.learned[i] ? "✓ Marked as learned" : "Mark this step as learned"}</button>
+          <span style="display:flex;gap:8px;flex-wrap:wrap">
+            ${i > 0 ? `<button type="button" class="btn" data-act="prev">← ${esc(STEPS[i - 1].name)}</button>` : ""}
+            ${i < N - 1 ? `<button type="button" class="btn" data-act="next">${esc(STEPS[i + 1].name)} →</button>` : ""}
+          </span>
+        </div>
+      </div>`;
+    const sh = $("sheet");
+    if (sh.hidden) { sh.classList.remove("unroll"); void sh.offsetWidth; if (!reduced) sh.classList.add("unroll"); }
+    sh.hidden = false; $("scrim").hidden = false;
+    $("paper").scrollTop = 0;
+    stopWalk();
+    document.body.style.overflow = "hidden";
+    $("sheet").querySelector(".x").focus({ preventScroll: true });
+  }
+  function closeSheet() {
+    $("sheet").hidden = true; $("scrim").hidden = true;
+    document.body.style.overflow = "";
+    clearTimeout(saveT); save();
+    const back = openStudyId !== null
+      ? (renderStudies(), document.querySelector(`.st-card[data-study="${CSS.escape(openStudyId)}"]`))
+      : document.querySelector(`.card[data-step="${openStep}"]`);
+    openStep = null; openStudyId = null;
+    if (back && back.style.visibility !== "hidden") back.focus({ preventScroll: true });
+  }
+  function changed() { save(); renderOverview(); renderRail(); refreshCardMeta(); update(); }
+
+  let toastT;
+  function toast(m) { const t = $("toast"); t.textContent = m; t.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => t.hidden = true, 2000); }
+  function arm(btn, label, fn) {
+    if (btn.classList.contains("armed")) return fn();
+    const old = btn.textContent; btn.classList.add("armed"); btn.textContent = label;
+    setTimeout(() => { if (btn.isConnected) { btn.classList.remove("armed"); btn.textContent = old; } }, 3500);
+  }
+
+  $("sheet").addEventListener("click", e => {
+    if (openStudyId !== null) return studyClick(e);
+    const b = e.target.closest("[data-act]");
+    if (!b || openStep === null) return;
+    const i = openStep, act = b.dataset.act;
+    if (act === "close") closeSheet();
+    else if (act === "prev") openSheet(i - 1);
+    else if (act === "next") openSheet(i + 1);
+    else if (act === "learned") { data.learned[i] = !data.learned[i]; changed(); openSheet(i); toast(data.learned[i] ? "Marked as learned" : "Unmarked"); }
+    else if (act === "delVerse") arm(b, "Tap to confirm", () => { data.verses[i] = myVerses(i).filter(v => v.id !== b.dataset.id); changed(); openSheet(i); toast("Verse removed"); });
+    else if (act === "delNote") arm(b, "Tap to confirm", () => { data.notes[i] = myNotes(i).filter(n => n.id !== b.dataset.id); changed(); openSheet(i); toast("Lesson removed"); });
+  });
+  $("sheet").addEventListener("submit", e => {
+    e.preventDefault();
+    if (openStudyId !== null) return studySubmit(e);
+    const i = openStep;
+    if (e.target.id === "verseForm") {
+      const ref = $("vRef").value.trim(), text = $("vText").value.trim();
+      if (!ref || !text) { $("vErr").textContent = "Add both the reference and the verse text."; return; }
+      myVerses(i).push({ id: uid(), ref, text }); changed(); openSheet(i); toast("Verse added");
+    } else if (e.target.id === "noteForm") {
+      const text = $("nText").value.trim();
+      if (!text) { $("nErr").textContent = "Write a lesson before saving."; return; }
+      myNotes(i).push({ id: uid(), text, date: new Date().toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" }) });
+      changed(); openSheet(i); toast("Lesson saved");
+    }
+  });
+  $("scrim").addEventListener("click", closeSheet);
+  document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("sheet").hidden) closeSheet(); });
+  document.addEventListener("click", e => {
+    const s = e.target.closest("[data-step]");
+    if (s) { openSheet(Number(s.dataset.step)); return; }
+    const g = e.target.closest("[data-go]");
+    if (g) goTo(Number(g.dataset.go));
+  });
+  $("brand").addEventListener("click", e => { e.preventDefault(); window.scrollTo({ top: 0, behavior: reduced ? "auto" : "smooth" }); });
+
   // ---------- boot ----------
-  ppy.last = ppy();
-  renderChips();
-  render();
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(renderTimeline);
+  renderOverview();
+  renderStudies();
+  if (!reduced) {
+    buildWorld();
+    renderRail();
+    refreshCardMeta();
+    paintClouds();
+    layout();
+    // one animation loop: scroll position drives the walk, time drives the drifting clouds
+    const frame = () => {
+      if (!document.hidden) {
+        if (window.scrollY < journeyTop() + $("journey").offsetHeight) update();
+        else { $("rail").classList.add("away"); $("walkBtn").classList.add("away"); }
+      }
+      requestAnimationFrame(frame);
+    };
+    requestAnimationFrame(frame);
+    window.addEventListener("scroll", () => { if (!walking) setWalkLabel(); }, { passive: true });
+    let rT;
+    window.addEventListener("resize", () => { clearTimeout(rT); rT = setTimeout(layout, 120); });
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(update);
+  }
 })();
 </script>
 </body>
