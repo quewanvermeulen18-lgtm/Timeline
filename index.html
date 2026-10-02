@@ -1,0 +1,802 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Bible Timeline</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=Spectral:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a long horizontal scroll of the centuries (era bands, lanes of events),
+   with a readable chronological list underneath and a side drawer for details and editing. */
+:root {
+  --bg: #eceff3;
+  --surface: #f8f9fb;
+  --surface-2: #e2e7ee;
+  --ink: #1b2433;
+  --muted: #5a6477;
+  --line: #cdd4de;
+  --accent: #2c4fa3;
+  --accent-ink: #ffffff;
+  --gold: #9c6c14;
+  --danger: #a3372d;
+  --band-a: rgba(44, 79, 163, 0.06);
+  --band-b: rgba(156, 108, 20, 0.07);
+  --shadow: 0 10px 30px rgba(27, 36, 51, 0.16);
+
+  --c-era: #6b5a3a;
+  --c-event: #2c4fa3;
+  --c-person: #7a4a9e;
+  --c-reign: #9c6c14;
+  --c-prophet: #23786a;
+  --c-writing: #a3372d;
+  --c-history: #66707f;
+
+  --f-display: "IM Fell English", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+  --f-body: "Spectral", "Iowan Old Style", Georgia, serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f131a; --surface: #161c26; --surface-2: #1f2733; --ink: #e4e8ef; --muted: #9aa4b5;
+    --line: #2b3444; --accent: #86a2f2; --accent-ink: #0f131a; --gold: #d9a94e; --danger: #f08a7e;
+    --band-a: rgba(134, 162, 242, 0.07); --band-b: rgba(217, 169, 78, 0.07);
+    --shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    --c-era: #c9b48a; --c-event: #86a2f2; --c-person: #c39be3; --c-reign: #d9a94e;
+    --c-prophet: #5fc4b1; --c-writing: #f08a7e; --c-history: #a3acba;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f131a; --surface: #161c26; --surface-2: #1f2733; --ink: #e4e8ef; --muted: #9aa4b5;
+  --line: #2b3444; --accent: #86a2f2; --accent-ink: #0f131a; --gold: #d9a94e; --danger: #f08a7e;
+  --band-a: rgba(134, 162, 242, 0.07); --band-b: rgba(217, 169, 78, 0.07);
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  --c-era: #c9b48a; --c-event: #86a2f2; --c-person: #c39be3; --c-reign: #d9a94e;
+  --c-prophet: #5fc4b1; --c-writing: #f08a7e; --c-history: #a3acba;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { margin: 0; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font: 16px/1.55 var(--f-body);
+  padding-inline: 16px;
+  padding-block: 0 48px;
+}
+.wrap { max-width: 1280px; margin: 0 auto; display: grid; gap: 20px; }
+button, input, select, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* Header */
+header.top {
+  display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 12px 24px;
+  padding-block: 28px 4px;
+}
+h1 {
+  font-family: var(--f-display); font-weight: 400; font-size: clamp(2rem, 4vw, 2.9rem);
+  line-height: 1.05; margin: 0; letter-spacing: 0.01em; text-wrap: balance;
+}
+h1 em { color: var(--gold); }
+.sub { margin: 6px 0 0; color: var(--muted); max-width: 62ch; }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.btn {
+  display: inline-flex; align-items: center; gap: 6px; cursor: pointer;
+  border: 1px solid var(--line); background: var(--surface); border-radius: 6px;
+  padding: 7px 14px; font-size: 0.95rem; line-height: 1.2;
+}
+.btn:hover { border-color: var(--muted); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); font-weight: 600; }
+.btn.danger { color: var(--danger); }
+.btn.danger.armed { background: var(--danger); border-color: var(--danger); color: var(--surface); }
+.btn.small { padding: 4px 10px; font-size: 0.85rem; }
+
+/* Toolbar */
+.toolbar {
+  display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center;
+  font-family: var(--f-mono); font-size: 0.78rem;
+}
+.search { flex: 1 1 220px; min-width: 0; position: relative; }
+.search input {
+  width: 100%; border: 1px solid var(--line); background: var(--surface); border-radius: 6px;
+  padding: 8px 12px; font-family: var(--f-body); font-size: 0.95rem;
+}
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip {
+  cursor: pointer; border: 1px solid var(--line); background: var(--surface); border-radius: 999px;
+  padding: 4px 10px 4px 8px; display: inline-flex; align-items: center; gap: 6px;
+  text-transform: uppercase; letter-spacing: 0.06em; font-size: 0.7rem;
+}
+.chip .sw { width: 9px; height: 9px; border-radius: 50%; background: var(--c); }
+.chip[aria-pressed="false"] { opacity: 0.45; }
+.chip[aria-pressed="false"] .sw { background: transparent; box-shadow: inset 0 0 0 1.5px var(--c); }
+.zoom { display: flex; align-items: center; gap: 8px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+.zoom input { width: 130px; accent-color: var(--accent); }
+
+/* Timeline */
+.tl-frame { border: 1px solid var(--line); border-radius: 8px; background: var(--surface); overflow: hidden; }
+.tl-scroll { overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain; }
+.tl { position: relative; min-height: 220px; }
+.band { position: absolute; top: 0; bottom: 0; border-right: 1px solid var(--line); }
+.band:nth-child(odd) { background: var(--band-a); }
+.band:nth-child(even) { background: var(--band-b); }
+.band-lbl {
+  position: absolute; top: 0; left: 0; right: 0; height: 30px; padding: 6px 8px 0;
+  font-family: var(--f-display); font-style: italic; font-size: 1rem; color: var(--c-era);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  background: none; border: 0; text-align: left; cursor: pointer;
+}
+.band-lbl:hover { text-decoration: underline; }
+.tick { position: absolute; top: 30px; bottom: 0; border-left: 1px dashed var(--line); }
+.tick span {
+  position: absolute; top: 4px; left: 4px; font-family: var(--f-mono); font-size: 0.68rem;
+  color: var(--muted); white-space: nowrap; font-variant-numeric: tabular-nums;
+}
+.undated {
+  position: absolute; left: 0; top: 0; bottom: 0; border-right: 2px solid var(--line);
+  background: var(--surface-2);
+}
+.undated-h {
+  font-family: var(--f-display); font-style: italic; color: var(--c-era); font-size: 1rem;
+  padding: 6px 10px 0; height: 30px;
+}
+.undated-note { position: absolute; top: 34px; left: 10px; font-family: var(--f-mono); font-size: 0.68rem; color: var(--muted); }
+
+.mk {
+  position: absolute; height: 24px; display: flex; align-items: center; gap: 6px;
+  background: none; border: 0; padding: 0; cursor: pointer; white-space: nowrap;
+  font-size: 0.86rem; color: var(--ink); text-align: left;
+}
+.mk .dot { width: 11px; height: 11px; border-radius: 50%; background: var(--c); flex: none; box-shadow: 0 0 0 3px var(--surface); }
+.mk.approx .dot { background: var(--surface); box-shadow: inset 0 0 0 2.5px var(--c), 0 0 0 3px var(--surface); }
+.mk .bar {
+  position: absolute; left: 0; top: 2px; height: 20px; border-radius: 3px;
+  background: color-mix(in srgb, var(--c) 18%, transparent); border-left: 3px solid var(--c);
+}
+.mk.span .lbl { position: relative; padding-left: 8px; }
+.mk .lbl { line-height: 1; }
+.mk:hover .lbl, .mk.sel .lbl { text-decoration: underline; text-underline-offset: 3px; }
+.mk.sel .dot, .mk.sel .bar { outline: 2px solid var(--ink); outline-offset: 2px; }
+.mk.dim { opacity: 0.18; }
+.tl-foot {
+  display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 16px; padding: 8px 12px;
+  border-top: 1px solid var(--line); font-family: var(--f-mono); font-size: 0.7rem; color: var(--muted);
+}
+.legend { display: flex; flex-wrap: wrap; gap: 4px 14px; align-items: center; }
+.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; vertical-align: -1px; margin-right: 4px; }
+
+/* Chronicle list */
+.cols { display: grid; grid-template-columns: minmax(0, 1fr); gap: 24px; }
+h2 { font-family: var(--f-display); font-weight: 400; font-size: 1.6rem; margin: 0; }
+.list-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.count { font-family: var(--f-mono); font-size: 0.75rem; color: var(--muted); }
+.chron { list-style: none; margin: 8px 0 0; padding: 0; }
+.chron .era-h {
+  font-family: var(--f-mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em;
+  color: var(--c-era); padding: 18px 0 6px; border-bottom: 1px solid var(--line);
+}
+.row {
+  display: grid; grid-template-columns: 10.5rem 1fr; gap: 4px 16px; padding: 10px 0;
+  border-bottom: 1px solid var(--line); cursor: pointer;
+}
+.row:hover .t { text-decoration: underline; text-underline-offset: 3px; }
+.row .d { font-family: var(--f-mono); font-size: 0.8rem; color: var(--muted); font-variant-numeric: tabular-nums; padding-top: 2px; }
+.row .main { min-width: 0; }
+.row .t { font-weight: 600; }
+.row .t::before {
+  content: ""; display: inline-block; width: 9px; height: 9px; border-radius: 50%;
+  background: var(--c); margin-right: 8px; vertical-align: 1px;
+}
+.row .ref { color: var(--gold); font-style: italic; margin-left: 6px; font-weight: 400; }
+.row .n { color: var(--muted); font-size: 0.92rem; margin-top: 2px; }
+.empty { color: var(--muted); padding: 16px 0; }
+@media (max-width: 560px) {
+  .row { grid-template-columns: 1fr; }
+}
+
+/* Drawer */
+.scrim { position: fixed; inset: 0; background: rgba(10, 14, 20, 0.35); z-index: 10; }
+.drawer {
+  position: fixed; top: 0; right: 0; bottom: 0; width: min(440px, 100%); z-index: 11;
+  background: var(--surface); border-left: 1px solid var(--line); box-shadow: var(--shadow);
+  display: flex; flex-direction: column;
+  padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+.drawer-h { display: flex; justify-content: space-between; align-items: center; padding: 14px 18px; border-bottom: 1px solid var(--line); }
+.drawer-h .kicker { font-family: var(--f-mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); }
+.x { background: none; border: 0; font-size: 1.5rem; line-height: 1; cursor: pointer; color: var(--muted); padding: 2px 6px; }
+.drawer-b { padding: 18px; overflow-y: auto; display: grid; gap: 14px; align-content: start; }
+.drawer-b h3 { font-family: var(--f-display); font-weight: 400; font-size: 1.9rem; line-height: 1.1; margin: 0; text-wrap: balance; }
+.meta { display: flex; flex-wrap: wrap; gap: 8px 14px; font-family: var(--f-mono); font-size: 0.78rem; color: var(--muted); }
+.tag { display: inline-flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.06em; }
+.tag i { width: 9px; height: 9px; border-radius: 50%; background: var(--c); }
+.refline { color: var(--gold); font-style: italic; font-size: 1.05rem; }
+.notes { white-space: pre-wrap; }
+.btns { display: flex; flex-wrap: wrap; gap: 8px; }
+
+form.edit { display: grid; gap: 14px; }
+.field { display: grid; gap: 4px; }
+.field > label, .field > .lab {
+  font-family: var(--f-mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted);
+}
+.field input[type="text"], .field input[type="number"], .field select, .field textarea {
+  width: 100%; border: 1px solid var(--line); background: var(--bg); border-radius: 6px; padding: 8px 10px;
+}
+.field textarea { min-height: 110px; resize: vertical; }
+.yr { display: grid; grid-template-columns: 1fr 5.5rem; gap: 6px; }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.check { display: flex; gap: 8px; align-items: center; font-size: 0.95rem; }
+.check input { accent-color: var(--accent); width: 16px; height: 16px; }
+.err { color: var(--danger); font-size: 0.9rem; min-height: 1.2em; }
+.hint { color: var(--muted); font-size: 0.85rem; }
+textarea.json { width: 100%; min-height: 220px; font-family: var(--f-mono); font-size: 0.75rem; border: 1px solid var(--line); background: var(--bg); border-radius: 6px; padding: 8px; }
+.toast {
+  position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%);
+  background: var(--ink); color: var(--bg); padding: 8px 16px; border-radius: 6px; z-index: 20; font-size: 0.9rem;
+}
+footer.note { color: var(--muted); font-size: 0.88rem; max-width: 75ch; }
+@media (max-width: 460px) { .two { grid-template-columns: 1fr; } }
+@media (prefers-reduced-motion: no-preference) {
+  .drawer { animation: slide 0.18s ease-out; }
+  @keyframes slide { from { transform: translateX(24px); opacity: 0.6; } }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1>Bible Timeline <em>·</em> from Abraham to Revelation</h1>
+      <p class="sub">Map the story of Scripture across the centuries. Click anything to read its details, add your own events, people and books, and keep your timeline in this browser.</p>
+    </div>
+    <div class="actions">
+      <button class="btn primary" id="addBtn" type="button">+ Add to timeline</button>
+      <button class="btn" id="dataBtn" type="button">Save &amp; share</button>
+    </div>
+  </header>
+
+  <div class="toolbar">
+    <div class="search"><input id="q" type="search" placeholder="Search names, places, references…" aria-label="Search the timeline"></div>
+    <div class="chips" id="chips" aria-label="Show or hide categories"></div>
+    <label class="zoom" for="zoom">Zoom <input id="zoom" type="range" min="0" max="100" value="38"></label>
+  </div>
+
+  <section class="tl-frame" aria-label="Timeline">
+    <div class="tl-scroll" id="tlScroll"><div class="tl" id="tl"></div></div>
+    <div class="tl-foot">
+      <div class="legend">
+        <span><i style="background:var(--c-event)"></i>solid dot: date fairly firm</span>
+        <span><i style="box-shadow:inset 0 0 0 2px var(--c-event)"></i>hollow dot: approximate</span>
+        <span>bars: spans of years</span>
+      </div>
+      <span>Scroll sideways to travel through time</span>
+    </div>
+  </section>
+
+  <section class="cols">
+    <div>
+      <div class="list-head"><h2>Chronicle</h2><span class="count" id="count"></span></div>
+      <ul class="chron" id="list"></ul>
+    </div>
+  </section>
+
+  <footer class="note">
+    Dates follow one widely used conservative chronology (Exodus c. 1446 BC, divided kingdom 931 BC, crucifixion c. AD 30). Scholars disagree on many of them, and the events before Abraham have no agreed dates, so they sit in their own undated column. Edit any entry to match the chronology you prefer.
+  </footer>
+</div>
+
+<div class="scrim" id="scrim" hidden></div>
+<aside class="drawer" id="drawer" hidden aria-modal="true" role="dialog" aria-labelledby="drawerKicker">
+  <div class="drawer-h"><span class="kicker" id="drawerKicker"></span><button class="x" id="closeBtn" type="button" aria-label="Close">×</button></div>
+  <div class="drawer-b" id="drawerBody"></div>
+</aside>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+(() => {
+  "use strict";
+  const STORE_KEY = "bible-timeline-v1";
+  const UNDATED_W = 230;
+  const LANE_H = 30;
+  const TOP = 66;
+
+  const CATS = {
+    era: "Era", event: "Event", person: "Person", reign: "Reign",
+    prophet: "Prophet", writing: "Book written", history: "World history"
+  };
+
+  // year: negative = BC, positive = AD, null = undated
+  const SAMPLE = [
+    ["era", "Patriarchs", -2166, -1876, "Gen 12–50", "Abraham, Isaac, Jacob and Joseph."],
+    ["era", "Egypt & Exodus", -1876, -1406, "Exodus–Deuteronomy", "Israel grows in Egypt, is enslaved, and is brought out under Moses."],
+    ["era", "Conquest & Judges", -1406, -1050, "Joshua–Judges, Ruth", ""],
+    ["era", "United Kingdom", -1050, -931, "1 Samuel–1 Kings 11", "Saul, David and Solomon rule all twelve tribes."],
+    ["era", "Divided Kingdom", -931, -586, "1 Kings 12–2 Kings 25", "Israel in the north, Judah in the south."],
+    ["era", "Exile", -586, -538, "Daniel, Ezekiel, Lamentations", ""],
+    ["era", "Return & Rebuilding", -538, -430, "Ezra, Nehemiah, Esther", ""],
+    ["era", "Between the Testaments", -430, -5, "", "About four centuries with no new prophetic book: Persian, Greek, Hasmonean and Roman rule."],
+    ["era", "Life of Jesus", -5, 30, "Matthew–John", ""],
+    ["era", "Early Church", 30, 100, "Acts–Revelation", ""],
+
+    ["event", "Creation", null, null, "Genesis 1–2", "", true],
+    ["event", "The Fall", null, null, "Genesis 3", "", true],
+    ["event", "The Flood", null, null, "Genesis 6–9", "", true],
+    ["event", "Tower of Babel", null, null, "Genesis 11", "", true],
+
+    ["person", "Abraham", -2166, -1991, "Genesis 11–25", ""],
+    ["event", "Call of Abram", -2091, null, "Genesis 12:1–4", "Abram leaves Haran at 75."],
+    ["person", "Isaac", -2066, -1886, "Genesis 21–35", ""],
+    ["person", "Jacob", -2006, -1859, "Genesis 25–50", "Renamed Israel (Gen 32:28)."],
+    ["event", "Joseph sold into Egypt", -1898, null, "Genesis 37", ""],
+    ["event", "Jacob's family settles in Egypt", -1876, null, "Genesis 46", "430 years before the Exodus (Ex 12:40)."],
+    ["person", "Moses", -1526, -1406, "Exodus–Deuteronomy", ""],
+    ["event", "The Exodus", -1446, null, "Exodus 12–14", "Dated from 1 Kings 6:1. A later date near 1270 BC is also widely held."],
+    ["event", "Law given at Sinai", -1445, null, "Exodus 19–20", ""],
+    ["event", "Wilderness wanderings", -1446, -1406, "Numbers 14", "Forty years in the wilderness."],
+    ["event", "Jericho falls", -1406, null, "Joshua 6", ""],
+    ["person", "Samuel", -1105, -1015, "1 Samuel 1–25", "Last of the judges."],
+    ["reign", "Saul", -1050, -1010, "1 Samuel 9–31", ""],
+    ["reign", "David", -1010, -970, "2 Samuel; 1 Chronicles 11–29", ""],
+    ["reign", "Solomon", -970, -931, "1 Kings 1–11", ""],
+    ["event", "First Temple dedicated", -959, null, "1 Kings 8", ""],
+    ["event", "Kingdom divides", -931, null, "1 Kings 12", "Rehoboam rules Judah, Jeroboam rules Israel.", false],
+    ["prophet", "Elijah", -875, -848, "1 Kings 17–2 Kings 2", ""],
+    ["prophet", "Isaiah", -740, -681, "Isaiah", ""],
+    ["event", "Fall of Samaria to Assyria", -722, null, "2 Kings 17", "End of the northern kingdom.", false],
+    ["event", "Josiah's reform", -622, null, "2 Kings 22–23", "The Book of the Law is found in the Temple."],
+    ["prophet", "Jeremiah", -627, -580, "Jeremiah", ""],
+    ["event", "Daniel taken to Babylon", -605, null, "Daniel 1", "", false],
+    ["prophet", "Ezekiel", -593, -571, "Ezekiel", ""],
+    ["event", "Jerusalem & Temple destroyed", -586, null, "2 Kings 25", "Nebuchadnezzar's army burns the city. Some date this to 587 BC.", false],
+    ["event", "Decree of Cyrus", -538, null, "Ezra 1", "First exiles return under Zerubbabel."],
+    ["event", "Second Temple completed", -516, null, "Ezra 6:15", "", false],
+    ["event", "Esther becomes queen", -479, null, "Esther 2"],
+    ["event", "Ezra returns to Jerusalem", -458, null, "Ezra 7"],
+    ["event", "Nehemiah rebuilds the walls", -445, null, "Nehemiah 1–6", "", false],
+    ["prophet", "Malachi", -430, null, "Malachi", "Last of the Old Testament prophets."],
+    ["history", "Alexander the Great conquers Judea", -332, null, "", "Greek language and culture spread through the region.", false],
+    ["history", "Septuagint translation begun", -250, null, "", "The Hebrew Scriptures translated into Greek in Alexandria."],
+    ["history", "Maccabean revolt", -167, -160, "1–2 Maccabees", "The Temple is rededicated in 164 BC, remembered at Hanukkah (John 10:22).", false],
+    ["history", "Pompey takes Jerusalem for Rome", -63, null, "", "", false],
+    ["reign", "Herod the Great", -37, -4, "Matthew 2", "", false],
+    ["event", "Birth of Jesus", -5, null, "Matthew 1–2; Luke 2", "Before Herod's death in 4 BC."],
+    ["prophet", "John the Baptist's ministry", 26, 29, "Luke 3", "Begins in the 15th year of Tiberius (Luke 3:1)."],
+    ["event", "Ministry of Jesus", 27, 30, "Matthew–John", "Many place it AD 29–33 instead."],
+    ["event", "Crucifixion & Resurrection", 30, null, "Matthew 26–28; John 18–21", ""],
+    ["event", "Pentecost", 30, null, "Acts 2", ""],
+    ["event", "Conversion of Paul", 34, null, "Acts 9"],
+    ["event", "Paul's 1st journey", 46, 48, "Acts 13–14"],
+    ["event", "Jerusalem Council", 49, null, "Acts 15"],
+    ["event", "Paul's 2nd journey", 49, 52, "Acts 15:36–18:22"],
+    ["writing", "1 Thessalonians", 51, null, "", "Likely Paul's earliest surviving letter."],
+    ["event", "Paul's 3rd journey", 53, 57, "Acts 18:23–21:16"],
+    ["writing", "Romans", 57, null, "", "Written from Corinth."],
+    ["writing", "Gospel of Mark", 60, null, "", "Often dated to the 60s."],
+    ["event", "Paul under house arrest in Rome", 60, 62, "Acts 28"],
+    ["history", "Temple destroyed by Rome", 70, null, "", "Titus ends the Jewish revolt.", false],
+    ["writing", "Revelation", 95, null, "Revelation 1:9", "Written on Patmos."]
+  ].map((r, i) => ({
+    id: "s" + i, cat: r[0], title: r[1], start: r[2], end: r[3], ref: r[4] || "", notes: r[5] || "",
+    approx: r[6] !== undefined ? r[6] : true
+  }));
+
+  // ---------- state ----------
+  let items = load() || clone(SAMPLE);
+  const hiddenCats = new Set();
+  let query = "";
+  let selectedId = null;
+
+  function clone(x) { return JSON.parse(JSON.stringify(x)); }
+  function load() {
+    try {
+      const raw = localStorage.getItem(STORE_KEY);
+      if (!raw) return null;
+      const parsed = normalize(JSON.parse(raw));
+      return parsed && parsed.length ? parsed : null;
+    } catch (e) { return null; }
+  }
+  function save() {
+    try { localStorage.setItem(STORE_KEY, JSON.stringify(items)); } catch (e) { /* storage unavailable */ }
+  }
+  function uid() {
+    try { return crypto.randomUUID(); } catch (e) { return "u" + Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
+  }
+  function normalize(data) {
+    const arr = Array.isArray(data) ? data : (data && Array.isArray(data.items) ? data.items : null);
+    if (!arr) return null;
+    const num = v => (v === null || v === undefined || v === "" || !isFinite(Number(v)) || Number(v) === 0) ? null : Math.round(Number(v));
+    return arr.filter(o => o && typeof o.title === "string" && o.title.trim()).map(o => {
+      let start = num(o.start), end = num(o.end);
+      if (start === null) end = null;
+      if (end !== null && end < start) end = null;
+      return {
+        id: typeof o.id === "string" && o.id ? o.id : uid(),
+        cat: CATS[o.cat] ? o.cat : "event",
+        title: o.title.trim().slice(0, 140),
+        start, end,
+        ref: typeof o.ref === "string" ? o.ref.slice(0, 200) : "",
+        notes: typeof o.notes === "string" ? o.notes.slice(0, 4000) : "",
+        approx: o.approx !== false
+      };
+    });
+  }
+
+  // ---------- helpers ----------
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const toT = y => (y < 0 ? y + 1 : y); // continuous axis with no year zero
+  const fmtYear = y => (y < 0 ? `${-y} BC` : `AD ${y}`);
+  function fmtDate(it) {
+    if (it.start === null) return "Undated";
+    const c = it.approx ? "c. " : "";
+    if (it.end === null) return c + fmtYear(it.start);
+    if (it.start < 0 && it.end < 0) return `${c}${-it.start}–${-it.end} BC`;
+    if (it.start > 0 && it.end > 0) return `${c}AD ${it.start}–${it.end}`;
+    return `${c}${fmtYear(it.start)} – ${fmtYear(it.end)}`;
+  }
+  const matches = it => !query || (it.title + " " + it.ref + " " + it.notes + " " + CATS[it.cat]).toLowerCase().includes(query);
+  const visible = it => !hiddenCats.has(it.cat);
+  const byTime = (a, b) => toT(a.start) - toT(b.start) || (a.end === null ? 0 : 1) - (b.end === null ? 0 : 1) || a.title.localeCompare(b.title);
+
+  function ppy() { // pixels per year from the zoom slider (log scale)
+    const v = Number($("zoom").value);
+    return 0.15 * Math.pow(40, v / 100);
+  }
+  function range() {
+    const dated = items.filter(i => i.start !== null);
+    if (!dated.length) return [toT(-2200), toT(100)];
+    let lo = Infinity, hi = -Infinity;
+    dated.forEach(i => { lo = Math.min(lo, toT(i.start)); hi = Math.max(hi, toT(i.end ?? i.start)); });
+    return [Math.floor((lo - 40) / 50) * 50, Math.ceil((hi + 40) / 50) * 50];
+  }
+
+  // ---------- timeline ----------
+  const measure = document.createElement("canvas").getContext("2d");
+  function textW(s) {
+    measure.font = "14px Spectral, Georgia, serif";
+    return measure.measureText(s).width;
+  }
+
+  function renderTimeline() {
+    const tl = $("tl");
+    const p = ppy();
+    const [lo, hi] = range();
+    const x = y => UNDATED_W + (toT(y) - lo) * p;
+    const width = UNDATED_W + (hi - lo) * p;
+    let html = "";
+
+    // era bands
+    const eras = items.filter(i => i.cat === "era" && i.start !== null && visible(i)).sort(byTime);
+    eras.forEach(e => {
+      const l = x(e.start), w = Math.max(2, x(e.end ?? e.start) - l);
+      html += `<div class="band" style="left:${l}px;width:${w}px"><button type="button" class="band-lbl" data-id="${esc(e.id)}" title="${esc(e.title)}">${esc(e.title)}</button></div>`;
+    });
+
+    // ticks
+    const steps = [10, 25, 50, 100, 200, 250, 500, 1000];
+    const step = steps.find(s => s * p >= 72) || 1000;
+    let ticks = "";
+    for (let y = Math.ceil((lo - 1) / step) * step; y <= hi; y += step) {
+      if (y === 0) continue;
+      const t = toT(y);
+      if (t < lo || t > hi) continue;
+      ticks += `<div class="tick" style="left:${x(y)}px"><span>${fmtYear(y)}</span></div>`;
+    }
+    html += ticks;
+
+    // lanes for dated, non-era markers
+    const marks = items.filter(i => i.cat !== "era" && i.start !== null && visible(i)).sort(byTime);
+    const laneEnds = [];
+    let markHtml = "";
+    marks.forEach(m => {
+      const x1 = x(m.start);
+      const isSpan = m.end !== null && m.end !== m.start;
+      const barW = isSpan ? Math.max(6, x(m.end) - x1) : 0;
+      const labelW = textW(m.title) + (isSpan ? 14 : 22);
+      const right = x1 + Math.max(barW, labelW) + 10;
+      let lane = laneEnds.findIndex(end => end <= x1);
+      if (lane === -1) { lane = laneEnds.length; laneEnds.push(0); }
+      laneEnds[lane] = right;
+      const cls = ["mk", isSpan ? "span" : "point", m.approx ? "approx" : "", m.id === selectedId ? "sel" : "", matches(m) ? "" : "dim"].join(" ");
+      const left = isSpan ? x1 : x1 - 5.5;
+      markHtml += `<button type="button" class="${cls}" data-id="${esc(m.id)}" style="left:${left}px;top:${TOP + lane * LANE_H}px;--c:var(--c-${m.cat})" title="${esc(m.title + " · " + fmtDate(m))}">` +
+        (isSpan ? `<span class="bar" style="width:${barW}px"></span>` : `<span class="dot"></span>`) +
+        `<span class="lbl">${esc(m.title)}</span></button>`;
+    });
+
+    // undated column
+    const und = items.filter(i => i.start === null && visible(i));
+    let undHtml = `<div class="undated" style="width:${UNDATED_W}px"><div class="undated-h">Before Abraham</div><div class="undated-note">UNDATED · in story order</div></div>`;
+    und.forEach((m, i) => {
+      const cls = ["mk", "point", "approx", m.id === selectedId ? "sel" : "", matches(m) ? "" : "dim"].join(" ");
+      undHtml += `<button type="button" class="${cls}" data-id="${esc(m.id)}" style="left:14px;top:${TOP + i * LANE_H}px;--c:var(--c-${m.cat})"><span class="dot"></span><span class="lbl">${esc(m.title)}</span></button>`;
+    });
+
+    const lanes = Math.max(laneEnds.length, und.length, 3);
+    tl.style.width = Math.ceil(width) + "px";
+    tl.style.height = (TOP + lanes * LANE_H + 16) + "px";
+    tl.innerHTML = html + undHtml + markHtml;
+  }
+
+  // ---------- list ----------
+  function renderList() {
+    const list = $("list");
+    const eras = items.filter(i => i.cat === "era" && i.start !== null).sort(byTime);
+    const rows = items.filter(i => visible(i) && matches(i) && i.cat !== "era");
+    const und = rows.filter(i => i.start === null);
+    const dated = rows.filter(i => i.start !== null).sort(byTime);
+    const eraOf = it => {
+      const t = toT(it.start);
+      let found = null;
+      eras.forEach(e => { if (t >= toT(e.start) && t < toT(e.end ?? e.start)) found = e; });
+      if (!found) eras.forEach(e => { if (t === toT(e.end ?? e.start)) found = found || e; });
+      return found;
+    };
+    let html = "";
+    const row = it => `<li class="row" tabindex="0" data-id="${esc(it.id)}" style="--c:var(--c-${it.cat})">
+      <div class="d">${esc(fmtDate(it))}</div>
+      <div class="main"><div class="t">${esc(it.title)}${it.ref ? `<span class="ref">${esc(it.ref)}</span>` : ""}</div>
+      ${it.notes ? `<div class="n">${esc(it.notes)}</div>` : ""}</div></li>`;
+    if (und.length) {
+      html += `<li class="era-h">Before Abraham · undated</li>`;
+      und.forEach(it => html += row(it));
+    }
+    let current;
+    dated.forEach(it => {
+      const e = eraOf(it);
+      const key = e ? e.id : "none";
+      if (key !== current) {
+        current = key;
+        html += `<li class="era-h">${e ? esc(e.title) + " · " + esc(fmtDate({ ...e, approx: false })) : "Outside the eras"}</li>`;
+      }
+      html += row(it);
+    });
+    list.innerHTML = html || `<li class="empty">Nothing matches. Clear the search or turn categories back on.</li>`;
+    $("count").textContent = `${rows.length} of ${items.filter(i => i.cat !== "era").length} entries · ${items.filter(i => i.cat === "era").length} eras`;
+  }
+
+  function renderChips() {
+    $("chips").innerHTML = Object.entries(CATS).map(([k, v]) =>
+      `<button type="button" class="chip" data-cat="${k}" aria-pressed="${!hiddenCats.has(k)}" style="--c:var(--c-${k})"><span class="sw"></span>${v}</button>`).join("");
+  }
+
+  function render() { renderTimeline(); renderList(); }
+
+  // ---------- drawer ----------
+  function openDrawer(kicker, body) {
+    $("drawerKicker").textContent = kicker;
+    $("drawerBody").innerHTML = body;
+    $("drawer").hidden = false;
+    $("scrim").hidden = false;
+  }
+  function closeDrawer() {
+    $("drawer").hidden = true;
+    $("scrim").hidden = true;
+    if (selectedId) { selectedId = null; renderTimeline(); }
+  }
+
+  function showItem(id) {
+    const it = items.find(i => i.id === id);
+    if (!it) return;
+    selectedId = id;
+    renderTimeline();
+    openDrawer(CATS[it.cat], `
+      <h3>${esc(it.title)}</h3>
+      <div class="meta"><span class="tag" style="--c:var(--c-${it.cat})"><i></i>${esc(CATS[it.cat])}</span><span>${esc(fmtDate(it))}</span>
+      ${it.end !== null ? `<span>${toT(it.end) - toT(it.start)} years</span>` : ""}</div>
+      ${it.ref ? `<div class="refline">${esc(it.ref)}</div>` : ""}
+      ${it.notes ? `<div class="notes">${esc(it.notes)}</div>` : `<div class="hint">No notes yet.</div>`}
+      <div class="btns">
+        <button type="button" class="btn" data-act="edit" data-id="${esc(it.id)}">Edit</button>
+        <button type="button" class="btn" data-act="goto" data-id="${esc(it.id)}">Show on timeline</button>
+        <button type="button" class="btn danger" data-act="delete" data-id="${esc(it.id)}">Delete</button>
+      </div>`);
+  }
+
+  function yearInputs(prefix, y) {
+    const abs = y === null || y === undefined ? "" : Math.abs(y);
+    const bc = y === null || y === undefined ? true : y < 0;
+    return `<div class="yr"><input type="number" min="1" max="9999" id="${prefix}Y" value="${abs}" inputmode="numeric">
+      <select id="${prefix}E" aria-label="BC or AD"><option value="BC"${bc ? " selected" : ""}>BC</option><option value="AD"${bc ? "" : " selected"}>AD</option></select></div>`;
+  }
+
+  function showForm(id) {
+    const it = id ? items.find(i => i.id === id) : { cat: "event", title: "", start: null, end: null, ref: "", notes: "", approx: true };
+    if (!it) return;
+    const undated = id ? it.start === null : false;
+    openDrawer(id ? "Edit entry" : "Add to timeline", `
+      <form class="edit" id="editForm" novalidate data-id="${id ? esc(id) : ""}">
+        <div class="field"><label for="fTitle">Title</label><input type="text" id="fTitle" required maxlength="140" value="${esc(it.title)}" placeholder="e.g. Ruth meets Boaz"></div>
+        <div class="field"><label for="fCat">Kind</label><select id="fCat">${Object.entries(CATS).map(([k, v]) => `<option value="${k}"${k === it.cat ? " selected" : ""}>${v}</option>`).join("")}</select>
+          <span class="hint">Eras draw as background bands. Give them a start and end year.</span></div>
+        <div class="two">
+          <div class="field"><label for="fStartY">Year (or start)</label>${yearInputs("fStart", it.start)}</div>
+          <div class="field"><label for="fEndY">End year (optional)</label>${yearInputs("fEnd", it.end)}</div>
+        </div>
+        <label class="check"><input type="checkbox" id="fApprox"${it.approx ? " checked" : ""}> Date is approximate</label>
+        <label class="check"><input type="checkbox" id="fUndated"${undated ? " checked" : ""}> No date (place in the undated column)</label>
+        <div class="field"><label for="fRef">Scripture reference</label><input type="text" id="fRef" maxlength="200" value="${esc(it.ref)}" placeholder="e.g. Ruth 2"></div>
+        <div class="field"><label for="fNotes">Notes</label><textarea id="fNotes" maxlength="4000" placeholder="What happened, why it matters, cross-references…">${esc(it.notes)}</textarea></div>
+        <div class="err" id="fErr" role="alert"></div>
+        <div class="btns"><button class="btn primary" type="submit">${id ? "Save changes" : "Add to timeline"}</button><button class="btn" type="button" data-act="cancel">Cancel</button></div>
+      </form>`);
+    syncUndated();
+    $("fTitle").focus();
+  }
+  function syncUndated() {
+    const u = $("fUndated");
+    if (!u) return;
+    ["fStartY", "fStartE", "fEndY", "fEndE"].forEach(k => { $(k).disabled = u.checked; });
+  }
+  function readYear(prefix) {
+    const raw = $(prefix + "Y").value.trim();
+    if (!raw) return null;
+    const n = Math.round(Number(raw));
+    if (!isFinite(n) || n < 1) return NaN;
+    return $(prefix + "E").value === "BC" ? -n : n;
+  }
+  function submitForm(form) {
+    const err = $("fErr");
+    const title = $("fTitle").value.trim();
+    if (!title) { err.textContent = "Give the entry a title."; $("fTitle").focus(); return; }
+    const undated = $("fUndated").checked;
+    let start = undated ? null : readYear("fStart");
+    let end = undated ? null : readYear("fEnd");
+    if (Number.isNaN(start) || Number.isNaN(end)) { err.textContent = "Years must be whole numbers of 1 or more."; return; }
+    if (!undated && start === null) { err.textContent = "Enter a year, or tick “No date”."; $("fStartY").focus(); return; }
+    if (end !== null && toT(end) < toT(start)) { err.textContent = "The end year comes before the start year. Check BC/AD."; return; }
+    if (end === start) end = null;
+    const cat = $("fCat").value;
+    if (cat === "era" && (start === null || end === null)) { err.textContent = "An era needs both a start and an end year."; return; }
+    const data = { title, cat, start, end, approx: $("fApprox").checked, ref: $("fRef").value.trim(), notes: $("fNotes").value.trim() };
+    const id = form.dataset.id;
+    if (id) Object.assign(items.find(i => i.id === id), data);
+    else items.push({ id: uid(), ...data });
+    save();
+    hiddenCats.delete(cat);
+    renderChips();
+    render();
+    const newId = id || items[items.length - 1].id;
+    showItem(newId);
+    scrollToItem(newId);
+    toast(id ? "Changes saved" : "Added to the timeline");
+  }
+
+  function scrollToItem(id) {
+    const el = $("tl").querySelector(`.mk[data-id="${CSS.escape(id)}"], .band-lbl[data-id="${CSS.escape(id)}"]`);
+    if (!el) return;
+    const sc = $("tlScroll");
+    const box = el.getBoundingClientRect(), sb = sc.getBoundingClientRect();
+    sc.scrollTo({ left: sc.scrollLeft + box.left - sb.left - sb.width / 3, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+    $("tlScroll").parentElement.scrollIntoView({ block: "nearest" });
+  }
+
+  function showData() {
+    const framed = (() => { try { return window.self !== window.top; } catch (e) { return true; } })();
+    openDrawer("Save & share", `
+      <h3>Your timeline</h3>
+      <p class="hint" style="margin:0">Changes save automatically in this browser. To move your timeline to another device or share it, copy this text (or download it) and load it there.</p>
+      <textarea class="json" id="jsonOut" readonly aria-label="Timeline data">${esc(JSON.stringify({ app: "bible-timeline", version: 1, items }, null, 1))}</textarea>
+      <div class="btns">
+        <button type="button" class="btn primary" data-act="copy">Copy timeline</button>
+        ${framed ? "" : `<button type="button" class="btn" data-act="download">Download .json</button>`}
+      </div>
+      <div class="field"><span class="lab">Load a timeline</span>
+        <textarea class="json" id="jsonIn" style="min-height:110px" placeholder="Paste timeline text here, or choose a file below" aria-label="Paste timeline data"></textarea>
+        <input type="file" id="fileIn" accept=".json,application/json">
+      </div>
+      <div class="err" id="dErr" role="alert"></div>
+      <div class="btns">
+        <button type="button" class="btn" data-act="import">Replace with pasted timeline</button>
+        <button type="button" class="btn danger" data-act="reset">Reset to the sample timeline</button>
+      </div>`);
+  }
+
+  function armOrRun(btn, label, fn) {
+    if (btn.classList.contains("armed")) { fn(); return; }
+    btn.classList.add("armed");
+    const old = btn.textContent;
+    btn.textContent = label;
+    setTimeout(() => { if (btn.isConnected) { btn.classList.remove("armed"); btn.textContent = old; } }, 4000);
+  }
+
+  let toastTimer;
+  function toast(msg) {
+    const t = $("toast");
+    t.textContent = msg; t.hidden = false;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => { t.hidden = true; }, 2200);
+  }
+
+  // ---------- events ----------
+  $("tl").addEventListener("click", e => {
+    const b = e.target.closest("[data-id]");
+    if (b) showItem(b.dataset.id);
+  });
+  $("list").addEventListener("click", e => {
+    const r = e.target.closest("[data-id]");
+    if (r) showItem(r.dataset.id);
+  });
+  $("list").addEventListener("keydown", e => {
+    const r = e.target.closest("[data-id]");
+    if (r && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); showItem(r.dataset.id); }
+  });
+  $("chips").addEventListener("click", e => {
+    const c = e.target.closest("[data-cat]");
+    if (!c) return;
+    const k = c.dataset.cat;
+    hiddenCats.has(k) ? hiddenCats.delete(k) : hiddenCats.add(k);
+    renderChips(); render();
+  });
+  $("q").addEventListener("input", e => { query = e.target.value.trim().toLowerCase(); render(); });
+  $("zoom").addEventListener("input", () => {
+    const sc = $("tlScroll");
+    const before = (sc.scrollLeft + sc.clientWidth / 2 - UNDATED_W) / ppy.last;
+    renderTimeline();
+    ppy.last = ppy();
+    sc.scrollLeft = Math.max(0, before * ppy.last + UNDATED_W - sc.clientWidth / 2);
+  });
+  $("addBtn").addEventListener("click", () => showForm(null));
+  $("dataBtn").addEventListener("click", showData);
+  $("closeBtn").addEventListener("click", closeDrawer);
+  $("scrim").addEventListener("click", closeDrawer);
+  document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("drawer").hidden) closeDrawer(); });
+
+  $("drawerBody").addEventListener("change", e => {
+    if (e.target.id === "fUndated") syncUndated();
+    if (e.target.id === "fileIn" && e.target.files[0]) {
+      const r = new FileReader();
+      r.onload = () => { $("jsonIn").value = String(r.result); $("dErr").textContent = "File loaded. Press “Replace with pasted timeline” to use it."; };
+      r.readAsText(e.target.files[0]);
+    }
+  });
+  $("drawerBody").addEventListener("submit", e => { e.preventDefault(); submitForm(e.target); });
+  $("drawerBody").addEventListener("click", e => {
+    const b = e.target.closest("[data-act]");
+    if (!b) return;
+    const act = b.dataset.act, id = b.dataset.id;
+    if (act === "edit") showForm(id);
+    else if (act === "cancel") { const fid = $("editForm").dataset.id; fid ? showItem(fid) : closeDrawer(); }
+    else if (act === "goto") { scrollToItem(id); }
+    else if (act === "delete") armOrRun(b, "Tap again to delete", () => {
+      items = items.filter(i => i.id !== id); save(); closeDrawer(); render(); toast("Deleted");
+    });
+    else if (act === "copy") {
+      const ta = $("jsonOut");
+      const fallback = () => { ta.focus(); ta.select(); toast("Selected. Press Ctrl+C or ⌘C to copy"); };
+      try { navigator.clipboard.writeText(ta.value).then(() => toast("Timeline copied"), fallback); } catch (err) { fallback(); }
+    }
+    else if (act === "download") {
+      const blob = new Blob([$("jsonOut").value], { type: "application/json" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob); a.download = "bible-timeline.json";
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    }
+    else if (act === "import") {
+      let parsed;
+      try { parsed = normalize(JSON.parse($("jsonIn").value)); } catch (err) { parsed = null; }
+      if (!parsed || !parsed.length) { $("dErr").textContent = "That text isn't a timeline. Paste the full text copied from “Copy timeline”."; return; }
+      armOrRun(b, `Tap again to replace with ${parsed.length} entries`, () => {
+        items = parsed; save(); closeDrawer(); render(); toast("Timeline loaded");
+      });
+    }
+    else if (act === "reset") armOrRun(b, "Tap again to erase your changes", () => {
+      items = clone(SAMPLE); save(); closeDrawer(); render(); toast("Sample timeline restored");
+    });
+  });
+
+  // ---------- boot ----------
+  ppy.last = ppy();
+  renderChips();
+  render();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(renderTimeline);
+})();
+</script>
+</body>
+</html>
