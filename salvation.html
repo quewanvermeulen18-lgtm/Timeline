@@ -212,6 +212,36 @@ a { color: var(--gold); }
 .rail.away { opacity: 0; pointer-events: none; }
 
 /* Overview */
+/* Weekly reading */
+.reading { max-width: 860px; margin: 0 auto; padding-inline: 16px; padding-block: 72px 8px; display: grid; gap: 16px; }
+.reading h2 { font-family: var(--f-display); font-weight: 600; font-size: clamp(2rem, 5vw, 2.8rem); color: var(--title); margin: 0; text-align: center; line-height: 1.1; }
+.rd-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+@media (max-width: 600px) { .rd-grid { grid-template-columns: minmax(0, 1fr); } }
+.rd-card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 18px 20px; display: grid; gap: 10px; align-content: start; min-width: 0; }
+.rd-card.wide { grid-column: 1 / -1; }
+.rd-card h3 { margin: 0; font-family: var(--f-label); font-weight: 800; text-transform: uppercase; letter-spacing: 0.02em; font-size: 1.15rem; color: var(--title); }
+.rd-card .pace { margin: -6px 0 0; font-style: italic; color: var(--muted); }
+.days { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(165px, 1fr)); gap: 8px; }
+.day { display: flex; align-items: center; gap: 10px; border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; background: var(--parch); }
+.day.read { border-color: var(--gold); }
+.day input { width: 20px; height: 20px; accent-color: var(--gold); flex: none; margin: 0; }
+.day label { flex: 1; min-width: 0; cursor: pointer; display: grid; line-height: 1.2; }
+.day label small { font-family: var(--f-label); font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+.day label b { white-space: nowrap; }
+.day.read label b { text-decoration: line-through; text-decoration-color: var(--gold); }
+.day a, .rd-card a.read-link { font-family: var(--f-label); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 600; color: var(--gold); text-decoration: none; }
+.stepper { display: flex; align-items: center; gap: 14px; }
+.stepper-lbl { margin: 0 0 -4px; font-family: var(--f-label); font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+.stepper button {
+  width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--line); background: var(--parch); cursor: pointer;
+  font-size: 1.3rem; line-height: 1; color: var(--title);
+}
+.stepper button:disabled { opacity: 0.35; cursor: default; }
+.stepper .at { font-size: 1.05rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.stepper .at b { font-family: var(--f-label); font-size: 1.4rem; color: var(--title); }
+.bar { height: 6px; border-radius: 3px; background: var(--parch-2); overflow: hidden; }
+.bar i { display: block; height: 100%; background: var(--gold); border-radius: 3px; }
+.blessing { margin: 6px 0 0; text-align: center; font-family: var(--f-display); font-style: italic; font-weight: 500; font-size: clamp(1.5rem, 4vw, 2.1rem); color: var(--title); text-wrap: balance; }
 .overview { max-width: 760px; margin: 0 auto; padding-inline: 16px; padding-block: 72px 40px; display: grid; gap: 18px; }
 .overview h2 { font-family: var(--f-display); font-weight: 600; font-size: clamp(2rem, 5vw, 2.8rem); color: var(--title); margin: 0; text-align: center; line-height: 1.1; text-wrap: balance; }
 .overview .lead { text-align: center; margin: 0 auto; max-width: 56ch; color: var(--muted); }
@@ -310,7 +340,7 @@ form.add .err { color: var(--danger); font-size: 0.9rem; }
 
 <nav class="topbar">
   <a href="#top" id="brand" aria-label="Back to the start">✝ <span class="brand-txt">Pattern of Salvation</span></a>
-  <span class="links"><a href="#overview">All steps</a><a href="index.html" id="timelineLink">Bible Timeline</a></span>
+  <span class="links"><a href="#leeswerk">Leeswerk</a><a href="#overview">All steps</a><a href="index.html" id="timelineLink">Bible Timeline</a></span>
 </nav>
 
 <section class="journey" id="journey" aria-label="Walk the path: scroll to move from step to step">
@@ -338,6 +368,14 @@ form.add .err { color: var(--danger); font-size: 0.9rem; }
 
 <nav class="rail" id="rail" aria-label="Jump to a step"></nav>
 <button type="button" class="btn primary walk" id="walkBtn" aria-pressed="false">▶ Walk the path</button>
+
+<section class="reading" id="leeswerk" aria-labelledby="rdTitle">
+  <div class="ornament" aria-hidden="true">✝</div>
+  <h2 id="rdTitle">Week se leeswerk</h2>
+  <p class="progress" id="rdProgress"></p>
+  <div class="rd-grid" id="rdGrid"></div>
+  <p class="blessing" id="rdBlessing"></p>
+</section>
 
 <section class="overview" id="overview">
   <div class="ornament" aria-hidden="true">✝</div>
@@ -483,10 +521,22 @@ form.add .err { color: var(--danger); font-size: 0.9rem; }
   const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 
   // ---------- saved study ----------
+  // This week's reading. Change it here each week; a new id starts the ticks afresh.
+  const READING = {
+    id: "spreuke-3-9",
+    daily: { book: "Spreuke", en: "Proverbs", from: 3, to: 9 },
+    ownPace: [
+      { book: "Genesis", en: "Genesis", start: 1, chapters: 50 },
+      { book: "Johannes", en: "John", start: 1, chapters: 21 }
+    ],
+    blessing: "May grace and shalom be ours in full measure"
+  };
+  const readUrl = (en, ch) => `https://www.biblegateway.com/passage/?search=${encodeURIComponent(en + " " + ch)}&version=AFR53`;
+
   let data = { learned: {}, verses: {}, notes: {} };
   try {
     const raw = JSON.parse(localStorage.getItem(STORE) || "null");
-    if (raw && typeof raw === "object") data = { learned: raw.learned || {}, verses: raw.verses || {}, notes: raw.notes || {} };
+    if (raw && typeof raw === "object") data = { learned: raw.learned || {}, verses: raw.verses || {}, notes: raw.notes || {}, reading: raw.reading };
   } catch (e) { /* start fresh */ }
   const save = () => { try { localStorage.setItem(STORE, JSON.stringify(data)); } catch (e) { /* storage unavailable */ } };
   const myVerses = i => (data.verses[i] = Array.isArray(data.verses[i]) ? data.verses[i] : []);
@@ -501,6 +551,65 @@ form.add .err { color: var(--danger); font-size: 0.9rem; }
   if (framed) $("timelineLink").hidden = true;
 
   // ---------- overview ----------
+  function readingState() {
+    let r = data.reading;
+    if (!r || typeof r !== "object") r = {};
+    if (r.id !== READING.id) r = { id: READING.id, done: {}, at: r.at || {} };
+    r.done = r.done || {}; r.at = r.at || {};
+    READING.ownPace.forEach(b => { if (!Number.isInteger(r.at[b.book])) r.at[b.book] = b.start; });
+    return (data.reading = r);
+  }
+  function renderReading() {
+    const r = readingState(), d = READING.daily;
+    const chs = []; for (let c = d.from; c <= d.to; c++) chs.push(c);
+    const done = chs.filter(c => r.done[c]).length;
+    $("rdProgress").textContent = `${done} van ${chs.length} hoofstukke van ${d.book} gelees`;
+    $("rdGrid").innerHTML = `
+      <div class="rd-card wide">
+        <h3>${esc(d.book)} ${d.from} – ${d.to}</h3>
+        <p class="pace">Een hoofstuk per dag</p>
+        <div class="bar" aria-hidden="true"><i style="width:${(done / chs.length * 100).toFixed(0)}%"></i></div>
+        <ul class="days">${chs.map((c, n) => `<li class="day${r.done[c] ? " read" : ""}">
+          <input type="checkbox" id="rd-${c}" data-ch="${c}"${r.done[c] ? " checked" : ""}>
+          <label for="rd-${c}"><small>Dag ${n + 1}</small><b>${esc(d.book)} ${c}</b></label>
+          <a href="${readUrl(d.en, c)}" target="_blank" rel="noopener" aria-label="Lees ${esc(d.book)} ${c}">Lees</a></li>`).join("")}</ul>
+      </div>
+      ${READING.ownPace.map(b => {
+        const at = r.at[b.book];
+        return `<div class="rd-card">
+          <h3>${esc(b.book)} ${b.start}</h3>
+          <p class="pace">Op eie tyd verder</p>
+          <p class="stepper-lbl">Waar ek nou is</p>
+          <div class="stepper">
+            <button type="button" data-book="${esc(b.book)}" data-d="-1" aria-label="Vorige hoofstuk"${at <= 1 ? " disabled" : ""}>−</button>
+            <span class="at">Hoofstuk <b>${at}</b> van ${b.chapters}</span>
+            <button type="button" data-book="${esc(b.book)}" data-d="1" aria-label="Volgende hoofstuk"${at >= b.chapters ? " disabled" : ""}>+</button>
+          </div>
+          <div class="bar" aria-hidden="true"><i style="width:${(at / b.chapters * 100).toFixed(0)}%"></i></div>
+          <a class="read-link" href="${readUrl(b.en, at)}" target="_blank" rel="noopener">Lees ${esc(b.book)} ${at} →</a>
+        </div>`;
+      }).join("")}`;
+    $("rdBlessing").textContent = READING.blessing;
+  }
+  $("rdGrid").addEventListener("change", e => {
+    const c = e.target.dataset.ch;
+    if (!c) return;
+    const r = readingState();
+    r.done[c] = e.target.checked;
+    save(); renderReading();
+    $("rd-" + c).focus();
+    if (e.target.checked) toast("Gelees ✓");
+  });
+  $("rdGrid").addEventListener("click", e => {
+    const b = e.target.closest("[data-book]");
+    if (!b) return;
+    const r = readingState(), book = READING.ownPace.find(x => x.book === b.dataset.book);
+    r.at[book.book] = clamp(r.at[book.book] + Number(b.dataset.d), 1, book.chapters);
+    save(); renderReading();
+    const again = $("rdGrid").querySelector(`[data-book="${b.dataset.book}"][data-d="${b.dataset.d}"]`);
+    if (again && !again.disabled) again.focus();
+  });
+
   function renderOverview() {
     $("ovList").innerHTML = STEPS.map((s, i) => `<li><button type="button" class="ov-item" data-step="${i}">
       <span class="num">${i + 1}</span>
@@ -863,6 +972,7 @@ form.add .err { color: var(--danger); font-size: 0.9rem; }
 
   // ---------- boot ----------
   renderOverview();
+  renderReading();
   if (!reduced) {
     buildWorld();
     renderRail();
