@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Archivo:wght@600;800&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap">
 <style>
 /* Layout: a sticky 3D stage where scrolling walks you up a winding path toward the cross,
-   one floating step card per stop; a flat overview list below; a sheet for each step's study. */
+   one floating step card per stop, storm clouds and rays of light around a road of light; a flat overview list below; each step's study unrolls as a scroll. */
 :root {
   --parch: #f6ecd6;
   --parch-2: #ecdcb8;
@@ -31,6 +31,12 @@
   --scrim: rgba(26, 30, 40, 0.45);
   --danger: #9b3a2c;
   --shadow: 0 18px 40px rgba(90, 64, 20, 0.18);
+  --cloud: #ffffff;
+  --cloud-shade: #ecd6ae;
+  --paper: #f7ebcf;
+  --paper-edge: #dcc08a;
+  --wood-1: #6e4a26;
+  --wood-2: #a87c4a;
 
   --f-display: "Cormorant Garamond", "Iowan Old Style", Georgia, serif;
   --f-label: "Archivo", "Helvetica Neue", Arial, sans-serif;
@@ -44,6 +50,7 @@
     --line: #2d3953; --badge-bg: #e0b45e; --badge-fg: #0e1526; --path: #3b3628; --path-edge: #57492c;
     --foot: #d2aa62; --glow: rgba(255, 196, 110, 0.55); --scrim: rgba(0, 0, 0, 0.6); --danger: #f0907f;
     --shadow: 0 18px 40px rgba(0, 0, 0, 0.5);
+    --cloud: #4a5578; --cloud-shade: #222b45; --paper: #1c2236; --paper-edge: #0f1324; --wood-1: #4e3420; --wood-2: #7f5a36;
     color-scheme: dark;
   }
 }
@@ -53,6 +60,7 @@
   --line: #2d3953; --badge-bg: #e0b45e; --badge-fg: #0e1526; --path: #3b3628; --path-edge: #57492c;
   --foot: #d2aa62; --glow: rgba(255, 196, 110, 0.55); --scrim: rgba(0, 0, 0, 0.6); --danger: #f0907f;
   --shadow: 0 18px 40px rgba(0, 0, 0, 0.5);
+  --cloud: #4a5578; --cloud-shade: #222b45; --paper: #1c2236; --paper-edge: #0f1324; --wood-1: #4e3420; --wood-2: #7f5a36;
   color-scheme: dark;
 }
 
@@ -71,10 +79,10 @@ a { color: var(--gold); }
   display: flex; justify-content: space-between; align-items: center; gap: 12px;
   padding: calc(10px + env(safe-area-inset-top, 0px)) 16px 10px;
   font-family: var(--f-label); font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase;
-  background: linear-gradient(var(--parch), transparent);
+  background: linear-gradient(rgba(12, 11, 16, 0.72), rgba(12, 11, 16, 0));
 }
-.topbar a { color: var(--title); text-decoration: none; font-weight: 600; }
-.topbar a:hover { color: var(--gold); }
+.topbar a { color: #f4e7cc; text-decoration: none; font-weight: 600; }
+.topbar a:hover { color: #e9c27a; }
 .topbar .links { display: flex; gap: 18px; }
 .topbar a { white-space: nowrap; }
 @media (max-width: 520px) { .topbar { font-size: 0.68rem; } .topbar .links { gap: 12px; } .brand-txt { display: none; } }
@@ -85,17 +93,31 @@ a { color: var(--gold); }
 .stage {
   position: sticky; top: 0; height: 100vh; height: 100dvh; overflow: hidden;
   perspective: 900px; perspective-origin: 50% 45%;
-  background: linear-gradient(var(--sky-top) 0%, var(--sky-bot) 46%, var(--parch-2) 100%);
+  /* one fixed look for the heavens, whatever the page theme; shown if the photo cannot load */
+  background: radial-gradient(circle at 58% 32%, #f6e2c6 0, #9a8073 22%, #3a343a 55%, #15151b 100%);
+}
+.sky-photo {
+  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 58% 32%;
+  transform-origin: 58% 32%; will-change: transform; pointer-events: none; user-select: none;
+}
+.rays {
+  position: absolute; inset: 0; pointer-events: none; mix-blend-mode: screen; transform-origin: 58% 32%;
+  background: repeating-conic-gradient(from 0deg at 58% 32%, rgba(255, 236, 205, 0) 0deg 4deg, rgba(255, 236, 205, 0.2) 6deg, rgba(255, 236, 205, 0) 8.5deg 13deg);
+  -webkit-mask-image: radial-gradient(circle at 58% 32%, #000 0, rgba(0, 0, 0, 0.55) 30%, transparent 70%);
+  mask-image: radial-gradient(circle at 58% 32%, #000 0, rgba(0, 0, 0, 0.55) 30%, transparent 70%);
+  filter: blur(7px);
 }
 .sun {
-  position: absolute; left: 50%; top: 30%; width: 70vmin; height: 70vmin; transform: translate(-50%, -50%);
-  background: radial-gradient(circle, var(--glow) 0%, transparent 62%); pointer-events: none;
+  position: absolute; left: 58%; top: 32%; width: 80vmin; height: 80vmin; transform: translate(-50%, -50%);
+  background: radial-gradient(circle, rgba(255, 244, 225, 0.85) 0%, rgba(255, 225, 185, 0.35) 30%, transparent 64%);
+  mix-blend-mode: screen; pointer-events: none;
 }
+.vignette { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse at 55% 40%, transparent 45%, rgba(8, 8, 12, 0.6) 100%); }
 .world { position: absolute; left: 50%; top: 45%; width: 0; height: 0; transform-style: preserve-3d; }
 .world > * { position: absolute; left: 0; top: 0; transform-origin: 0 0; backface-visibility: hidden; }
 .world > .floor { display: block; backface-visibility: visible; }
-.halo { border-radius: 50%; background: radial-gradient(circle, var(--glow) 0%, transparent 65%); pointer-events: none; }
-.hill { border-radius: 50% 50% 0 0 / 100% 100% 0 0; background: radial-gradient(ellipse at 50% 100%, var(--path-edge) 0%, var(--path) 45%, transparent 72%); pointer-events: none; }
+.halo { border-radius: 50%; background: radial-gradient(circle, rgba(255, 246, 228, 0.95) 0%, rgba(255, 220, 170, 0.4) 30%, transparent 65%); pointer-events: none; }
+.hill { border-radius: 50%; background: radial-gradient(ellipse at 50% 60%, rgba(255, 232, 196, 0.55) 0%, rgba(255, 220, 180, 0.2) 40%, transparent 70%); pointer-events: none; }
 .cross3d { pointer-events: none; }
 .cross3d svg { width: 100%; height: 100%; display: block; }
 
@@ -139,23 +161,25 @@ a { color: var(--gold); }
 }
 .ornament { display: flex; align-items: center; justify-content: center; gap: 12px; color: var(--gold); }
 .ornament::before, .ornament::after { content: ""; height: 1px; width: min(120px, 22vw); background: var(--gold-soft); }
-.hero .pre { font-family: var(--f-display); font-weight: 500; font-size: clamp(1.8rem, 5vw, 3rem); color: var(--title); line-height: 1; margin: 10px 0 0; }
+.hero { text-shadow: 0 2px 24px rgba(10, 8, 12, 0.65); }
+.hero .pre { font-family: var(--f-display); font-weight: 500; font-size: clamp(1.8rem, 5vw, 3rem); color: #f7ecd6; line-height: 1; margin: 10px 0 0; }
 .hero h1 {
-  margin: 0; font-family: var(--f-display); font-weight: 600; color: var(--title);
+  margin: 0; font-family: var(--f-display); font-weight: 600; color: #fbf2df;
   font-size: clamp(3rem, 13vw, 7.5rem); line-height: 0.95; letter-spacing: 0.04em; text-transform: uppercase;
 }
-.hero .tag { font-style: italic; font-size: clamp(1.05rem, 2.6vw, 1.35rem); margin: 10px 0 0; color: var(--ink); }
+.hero .tag { font-style: italic; font-size: clamp(1.05rem, 2.6vw, 1.35rem); margin: 10px 0 0; color: #efe2c8; }
+.hero .ornament { color: #e9c27a; }
 .hint {
   position: absolute; left: 50%; bottom: calc(22px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%);
-  font-family: var(--f-label); font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted);
+  font-family: var(--f-label); font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(247, 236, 214, 0.85);
   display: flex; flex-direction: column; align-items: center; gap: 4px; pointer-events: none;
 }
 .finale {
   position: absolute; left: 0; right: 0; bottom: calc(44px + env(safe-area-inset-bottom, 0px)); text-align: center; padding-inline: 16px;
 }
-.finale blockquote { margin: 0; font-family: var(--f-display); font-style: italic; font-weight: 500; font-size: clamp(1.8rem, 5vw, 2.8rem); color: var(--title); line-height: 1.1; }
-.finale cite { display: block; margin-top: 6px; font-style: normal; color: var(--gold); font-size: 1rem; }
-.finale .motto { font-family: var(--f-label); font-size: 0.75rem; letter-spacing: 0.16em; text-transform: uppercase; margin: 16px 0 12px; color: var(--ink); }
+.finale blockquote { margin: 0; font-family: var(--f-display); font-style: italic; font-weight: 500; font-size: clamp(1.8rem, 5vw, 2.8rem); color: #fbf2df; line-height: 1.1; text-shadow: 0 2px 24px rgba(10, 8, 12, 0.7); }
+.finale cite { display: block; margin-top: 6px; font-style: normal; color: #e9c27a; font-size: 1rem; }
+.finale .motto { font-family: var(--f-label); font-size: 0.75rem; letter-spacing: 0.16em; text-transform: uppercase; margin: 16px 0 12px; color: #efe2c8; text-shadow: 0 1px 12px rgba(10, 8, 12, 0.8); }
 .btn {
   display: inline-flex; align-items: center; gap: 6px; cursor: pointer; text-decoration: none;
   border: 1px solid var(--line); background: var(--card); color: var(--title); border-radius: 999px;
@@ -165,6 +189,13 @@ a { color: var(--gold); }
 .btn.primary { background: var(--badge-bg); color: var(--badge-fg); border-color: var(--badge-bg); }
 .btn.danger { color: var(--danger); }
 .btn.armed { background: var(--danger); border-color: var(--danger); color: var(--card); }
+
+.world > .cloud { pointer-events: none; }
+.walk {
+  position: fixed; left: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); z-index: 26; transition: opacity 0.3s;
+}
+.walk.away { opacity: 0; pointer-events: none; }
+@media (max-width: 600px) { .hint { bottom: calc(74px + env(safe-area-inset-bottom, 0px)); } }
 
 /* Step rail */
 .rail {
@@ -203,14 +234,33 @@ a { color: var(--gold); }
 .scrim { position: fixed; inset: 0; background: var(--scrim); z-index: 40; }
 .sheet {
   position: fixed; z-index: 41; left: 50%; top: 50%; transform: translate(-50%, -50%);
-  width: min(680px, calc(100% - 32px)); max-height: min(88vh, 900px); overflow-y: auto; overscroll-behavior: contain;
-  background: var(--parch); border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow);
+  width: min(700px, calc(100% - 24px)); max-height: min(88vh, 900px);
+  display: grid; grid-template-rows: auto minmax(0, 1fr) auto;
+  filter: drop-shadow(0 18px 30px rgba(40, 25, 5, 0.35));
+}
+.sheet.unroll { animation: unroll 0.75s cubic-bezier(.2, .7, .2, 1) both; }
+@keyframes unroll { from { max-height: 60px; } to { max-height: min(88vh, 900px); } }
+.roller {
+  position: relative; height: 22px; margin-inline: 2px; border-radius: 11px; z-index: 2;
+  background: linear-gradient(var(--wood-2), var(--wood-1) 55%, var(--wood-1));
+}
+.roller::before, .roller::after {
+  content: ""; position: absolute; top: -5px; width: 16px; height: 32px; border-radius: 8px;
+  background: linear-gradient(90deg, var(--wood-1), var(--wood-2), var(--wood-1));
+}
+.roller::before { left: -8px; }
+.roller::after { right: -8px; }
+.paper {
+  margin-inline: 14px; overflow-y: auto; overscroll-behavior: contain; min-height: 0;
+  background: radial-gradient(ellipse at 50% 40%, var(--paper) 55%, var(--paper-edge) 130%);
+  box-shadow: inset 0 10px 12px -8px rgba(60, 35, 10, 0.35), inset 0 -10px 12px -8px rgba(60, 35, 10, 0.35);
 }
 @media (max-width: 600px) {
-  .sheet { left: 0; right: 0; bottom: 0; top: auto; transform: none; width: 100%; max-height: 90vh; border-radius: 16px 16px 0 0; padding-bottom: env(safe-area-inset-bottom, 0px); }
+  .sheet { left: 0; right: 0; bottom: 0; top: auto; transform: none; width: 100%; max-height: 90vh; padding-bottom: env(safe-area-inset-bottom, 0px); }
+  @keyframes unroll { from { max-height: 60px; } to { max-height: 90vh; } }
 }
 .sheet-h {
-  position: sticky; top: 0; z-index: 1; background: var(--parch); border-bottom: 1px solid var(--line);
+  position: sticky; top: 0; z-index: 1; background: var(--paper); border-bottom: 1px solid var(--line);
   display: grid; grid-template-columns: auto 1fr auto; gap: 14px; align-items: center; padding: 16px 18px;
 }
 .sheet-h .kicker { font-family: var(--f-label); font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
@@ -252,7 +302,7 @@ form.add .err { color: var(--danger); font-size: 0.9rem; }
 /* No 3D walk for people who ask for less motion: the overview carries everything. */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-snap-type: none; }
-  .journey, .rail { display: none; }
+  .journey, .rail, .walk { display: none; }
 }
 </style>
 </head>
@@ -266,7 +316,10 @@ form.add .err { color: var(--danger); font-size: 0.9rem; }
 <section class="journey" id="journey" aria-label="Walk the path: scroll to move from step to step">
   <a id="top"></a>
   <div class="stage" id="stage">
+    <img class="sky-photo" id="skyPhoto" src="images/heaven-clouds.jpg" alt="" aria-hidden="true" decoding="async">
+    <div class="rays" id="rays" aria-hidden="true"></div>
     <div class="sun" id="sun"></div>
+    <div class="vignette" aria-hidden="true"></div>
     <div class="world" id="world"></div>
     <div class="hero" id="hero">
       <div class="ornament" aria-hidden="true">✝</div>
@@ -284,6 +337,7 @@ form.add .err { color: var(--danger); font-size: 0.9rem; }
 </section>
 
 <nav class="rail" id="rail" aria-label="Jump to a step"></nav>
+<button type="button" class="btn primary walk" id="walkBtn" aria-pressed="false">▶ Walk the path</button>
 
 <section class="overview" id="overview">
   <div class="ornament" aria-hidden="true">✝</div>
@@ -299,7 +353,11 @@ form.add .err { color: var(--danger); font-size: 0.9rem; }
 </section>
 
 <div class="scrim" id="scrim" hidden></div>
-<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle" hidden></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle" hidden>
+  <div class="roller" aria-hidden="true"></div>
+  <div class="paper" id="paper"></div>
+  <div class="roller" aria-hidden="true"></div>
+</div>
 <div class="toast" id="toast" hidden></div>
 
 <script>
@@ -462,6 +520,71 @@ form.add .err { color: var(--danger); font-size: 0.9rem; }
   const pathX = t => A * Math.sin(t * 1.15 - 0.3);
   const pathDX = t => A * 1.15 * Math.cos(t * 1.15 - 0.3);
 
+  // ---------- clouds ----------
+  function rng(seed) { return () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+  const CLOUDS = (() => {
+    const r = rng(11), out = [];
+    for (let n = 0; n < 26; n++) {
+      const w = 900 + r() * 1000, h = w * (0.4 + r() * 0.16);
+      const t = -0.5 + r() * (N + 2.4);
+      const kind = n % 3; // 0 overhead, 1 beside the road, 2 a sea of cloud below it
+      const side = r() < 0.5 ? -1 : 1;
+      const off = kind === 0 ? (r() - 0.5) * 1800 : side * (w / 2 + 240 + r() * 600);
+      const y = kind === 0 ? -(520 + r() * 700) - h : kind === 1 ? -(h * 0.75) - r() * 220 : 60 + r() * 220;
+      out.push({ w, h, t, off: kind === 2 ? (r() - 0.5) * 2200 : off, y, low: kind === 2, zj: -240 - r() * 420, seed: Math.floor(r() * 1e9), sway: 40 + r() * 120, speed: 0.04 + r() * 0.1, phase: r() * 6.28 });
+    }
+    return out;
+  })();
+  let cloudEls = [];
+  function fade(c, a) { // same colour, new alpha, so soft edges never turn grey
+    const m = /^#?([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i.exec(c.trim());
+    return m ? `rgba(${parseInt(m[1], 16)}, ${parseInt(m[2], 16)}, ${parseInt(m[3], 16)}, ${a})` : `rgba(255, 255, 255, ${a})`;
+  }
+  // storm-dark bodies, cool shadows underneath, sunlit rims on top, like clouds around an opening of light
+  function paintCloud(cv, w, h, seed, k) {
+    cv.width = Math.round(w * k); cv.height = Math.round(h * k);
+    cv.style.width = w + "px"; cv.style.height = h + "px";
+    const g = cv.getContext("2d"), r = rng(seed);
+    g.scale(k, k);
+    const puff = (x, y, rad, c, a) => {
+      const gr = g.createRadialGradient(x, y, 0, x, y, rad);
+      gr.addColorStop(0, fade(c, 1)); gr.addColorStop(0.55, fade(c, 0.6)); gr.addColorStop(1, fade(c, 0));
+      g.globalAlpha = a; g.fillStyle = gr; g.beginPath(); g.arc(x, y, rad, 0, Math.PI * 2); g.fill();
+    };
+    const puffs = [];
+    for (let n = 0; n < 34; n++) {
+      const x = w * (0.1 + r() * 0.8);
+      const bump = Math.sin(((x / w) - 0.12) / 0.76 * Math.PI);
+      const rad = h * (0.12 + r() * 0.2) * (0.6 + bump * 0.75);
+      puffs.push([x, h * 0.7 - bump * h * 0.26 - r() * h * 0.1, rad]);
+    }
+    puffs.forEach(([x, y, rad]) => puff(x, y + rad * 0.35, rad * 1.1, "#2a2a33", 0.32));
+    puffs.forEach(([x, y, rad]) => puff(x, y, rad, "#6f5f5a", 0.42));
+    puffs.forEach(([x, y, rad]) => puff(x - rad * 0.1, y - rad * 0.4, rad * 0.6, "#f4dcbd", 0.38));
+    g.globalAlpha = 1;
+  }
+  function paintClouds() {
+    cloudEls.forEach((cv, n) => { const c = CLOUDS[n]; paintCloud(cv, c.w, c.h, c.seed, 0.3); });
+  }
+  function updateClouds(p, camX, camZ, time) {
+    cloudEls.forEach((cv, n) => {
+      const c = CLOUDS[n];
+      const z = -c.t * S + c.zj + camZ;
+      const x = pathX(c.t) + c.off + Math.sin(time * c.speed + c.phase) * c.sway - camX;
+      let op = 1;
+      if (z > -220) op = 1 - (z + 220) / 420;
+      else if (z < -6500) op = 1 - (-z - 6500) / 1500;
+      op = clamp(op, 0, 1) * (c.low ? 0.6 : 0.9);
+      place(cv, x - c.w / 2, c.low ? floorY + c.y : c.y, z, "");
+      cv.style.opacity = op.toFixed(3);
+      cv.style.visibility = op < 0.02 ? "hidden" : "visible";
+    });
+    // the sky photo drifts closer to the light as you walk; the rays sway slowly
+    $("skyPhoto").style.transform = `scale(${(1.04 + p * 0.07 + Math.sin(time * 0.05) * 0.01).toFixed(4)}) translateX(${(Math.sin(time * 0.03) * 8).toFixed(1)}px)`;
+    $("rays").style.transform = `rotate(${(Math.sin(time * 0.12) * 2.5).toFixed(2)}deg)`;
+    $("rays").style.opacity = (0.55 + 0.35 * p / (N + 1) + Math.sin(time * 0.5) * 0.08).toFixed(3);
+  }
+
   function buildWorld() {
     let html = "";
     for (let j = 0; j * SEG < FL; j++) html += `<canvas class="floor" data-seg="${j}" aria-hidden="true"></canvas>`;
@@ -475,7 +598,9 @@ form.add .err { color: var(--danger); font-size: 0.9rem; }
       <span class="verse">“${esc(shortVerse(s.verses[0][1]))}” <b>${esc(s.verses[0][0])}</b></span>
       <span class="foot"><span class="meta" data-meta="${i}"></span><span class="open">Open step →</span></span>
     </button>`).join("");
+    html += CLOUDS.map((c, n) => `<canvas class="cloud" data-cloud="${n}" aria-hidden="true"></canvas>`).join("");
     world.innerHTML = html;
+    cloudEls = [...world.querySelectorAll(".cloud")];
     floorSegs = [...world.querySelectorAll(".floor")];
     cards = [...world.querySelectorAll(".card")];
     cross = $("cross3d"); halo = $("halo"); hill = $("hill");
@@ -492,9 +617,6 @@ form.add .err { color: var(--danger); font-size: 0.9rem; }
   }
 
   function drawFloor() {
-    const css = getComputedStyle(document.documentElement);
-    const col = n => css.getPropertyValue(n).trim();
-    const ground = col("--parch-2"), path = col("--path"), edge = col("--path-edge"), foot = col("--foot");
     const k = 0.35;
     floorSegs.forEach((cv, j) => {
       const v0 = j * SEG, len = Math.min(SEG, FL - v0);
@@ -502,27 +624,27 @@ form.add .err { color: var(--danger); font-size: 0.9rem; }
       cv.style.width = FW + "px"; cv.style.height = len + "px";
       const g = cv.getContext("2d");
       g.setTransform(k, 0, 0, k, 0, -v0 * k);
-      // ground fades out toward the sides
-      const grad = g.createLinearGradient(0, 0, FW, 0);
-      grad.addColorStop(0, "rgba(0,0,0,0)"); grad.addColorStop(0.25, ground); grad.addColorStop(0.75, ground); grad.addColorStop(1, "rgba(0,0,0,0)");
-      g.fillStyle = grad; g.globalAlpha = 0.7; g.fillRect(0, v0, FW, len); g.globalAlpha = 1;
-      // winding path
+      // a glowing road of light through the clouds
       const pts = [];
       for (let v = v0 - 60; v <= v0 + len + 60; v += 20) pts.push([pathX((v - Z0) / S) + FW / 2, v]);
       const stroke = (w, c, a) => {
         g.beginPath(); pts.forEach(([u, v], n) => n ? g.lineTo(u, v) : g.moveTo(u, v));
         g.lineWidth = w; g.strokeStyle = c; g.globalAlpha = a; g.lineCap = "round"; g.lineJoin = "round"; g.stroke(); g.globalAlpha = 1;
       };
-      stroke(320, edge, 0.45); stroke(240, path, 1);
+      g.shadowColor = "rgba(255, 226, 180, 0.9)"; g.shadowBlur = 30;
+      stroke(360, "rgba(255, 226, 186, 0.16)", 1);
+      g.shadowBlur = 0;
+      stroke(240, "rgba(255, 236, 206, 0.32)", 1);
+      stroke(100, "rgba(255, 247, 232, 0.28)", 1);
       // footprints, alternating left and right
-      g.fillStyle = foot;
+      g.fillStyle = "#fff3dc";
       let side = 1;
       for (let t = 0.1; t < N + 1.4; t += 0.16, side = -side) {
         const v = Z0 + t * S;
         if (v < v0 - 40 || v > v0 + len + 40) continue;
         const u = pathX(t) + FW / 2 + side * 22;
         const ang = -Math.atan(pathDX(t) / S);
-        g.save(); g.translate(u, v); g.rotate(ang); g.globalAlpha = 0.5;
+        g.save(); g.translate(u, v); g.rotate(ang); g.globalAlpha = 0.6;
         g.beginPath(); g.ellipse(0, 6, 8, 16, 0, 0, Math.PI * 2); g.fill();          // sole
         g.beginPath(); g.ellipse(0, -16, 6.5, 8, 0, 0, Math.PI * 2); g.fill();       // heel (toward the walker)
         for (let n = 0; n < 4; n++) { g.beginPath(); g.arc(-6 + n * 4, 26 + Math.abs(n - 1.5), 2.2, 0, Math.PI * 2); g.fill(); }
@@ -583,19 +705,22 @@ form.add .err { color: var(--danger); font-size: 0.9rem; }
     cross.style.width = CW + "px"; cross.style.height = CH + "px";
     place(halo, cx - 1100, floorY - CH - 700, cz - 40, "");
     halo.style.width = halo.style.height = "2200px";
-    place(hill, cx - 1400, floorY - 340, cz + 60, "");
-    hill.style.width = "2800px"; hill.style.height = "380px";
+    place(hill, cx - 1600, floorY - 420, cz + 80, "");
+    hill.style.width = "3200px"; hill.style.height = "700px";
+    updateClouds(p, camX, camZ, performance.now() / 1000);
     // overlays
     const heroOp = clamp(1 - p * 1.8, 0, 1);
     $("hero").style.opacity = heroOp; $("hero").style.visibility = heroOp < 0.02 ? "hidden" : "visible";
     $("hint").style.opacity = clamp(1 - p * 3, 0, 1);
     $("finale").hidden = p < N + 0.55;
     $("finale").style.opacity = clamp((p - (N + 0.55)) * 2.5, 0, 1);
-    $("sun").style.opacity = (0.35 + 0.65 * p / (N + 1)).toFixed(3);
+    $("sun").style.opacity = (0.45 + 0.55 * p / (N + 1)).toFixed(3);
     // rail
     const cur = Math.round(p) - 1;
     $("rail").querySelectorAll("button").forEach((b, i) => b.classList.toggle("on", i === cur));
-    $("rail").classList.toggle("away", window.scrollY > journeyTop() + (N + 1) * stepPx + vh * 0.5);
+    const past = window.scrollY > journeyTop() + (N + 1) * stepPx + vh * 0.5;
+    $("rail").classList.toggle("away", past);
+    $("walkBtn").classList.toggle("away", past || (p > N + 0.5 && !walking));
   }
 
   function renderRail() {
@@ -606,13 +731,38 @@ form.add .err { color: var(--danger); font-size: 0.9rem; }
     window.scrollTo({ top: journeyTop() + T * stepPx, behavior: reduced ? "auto" : "smooth" });
   }
 
+  // ---------- walk the path for me ----------
+  let walking = false, walkTimer = 0;
+  function setWalkLabel() {
+    const b = $("walkBtn");
+    b.textContent = walking ? "❚❚ Pause" : (progress() >= N + 0.9 ? "↺ Walk again" : "▶ Walk the path");
+    b.setAttribute("aria-pressed", String(walking));
+  }
+  function walkStep() {
+    if (!walking) return;
+    const next = Math.floor(progress() + 0.05) + 1;
+    if (next > N + 1) { stopWalk(); return; }
+    goTo(next);
+    walkTimer = setTimeout(next >= N + 1 ? stopWalk : walkStep, next >= N + 1 ? 1600 : 4200);
+  }
+  function startWalk() {
+    if (progress() >= N + 0.9) window.scrollTo({ top: journeyTop(), behavior: "auto" });
+    walking = true; setWalkLabel();
+    walkTimer = setTimeout(walkStep, 250);
+  }
+  function stopWalk() { walking = false; clearTimeout(walkTimer); setWalkLabel(); }
+  $("walkBtn").addEventListener("click", () => walking ? stopWalk() : startWalk());
+  ["wheel", "touchstart", "keydown"].forEach(ev => window.addEventListener(ev, e => {
+    if (walking && !(e.type === "keydown" && e.target === $("walkBtn"))) stopWalk();
+  }, { passive: true }));
+
   // ---------- study sheet ----------
   let openStep = null;
   function openSheet(i) {
     openStep = i;
     const s = STEPS[i];
     const mv = myVerses(i), mn = myNotes(i);
-    $("sheet").innerHTML = `
+    $("paper").innerHTML = `
       <div class="sheet-h">
         <span class="num">${i + 1}</span>
         <div><div class="kicker">Step ${i + 1} of ${N}</div><h2 id="sheetTitle">${esc(s.name)}</h2><div style="font-style:italic">${esc(s.sub)}</div></div>
@@ -651,8 +801,11 @@ form.add .err { color: var(--danger); font-size: 0.9rem; }
           </span>
         </div>
       </div>`;
-    $("sheet").hidden = false; $("scrim").hidden = false;
-    $("sheet").scrollTop = 0;
+    const sh = $("sheet");
+    if (sh.hidden) { sh.classList.remove("unroll"); void sh.offsetWidth; if (!reduced) sh.classList.add("unroll"); }
+    sh.hidden = false; $("scrim").hidden = false;
+    $("paper").scrollTop = 0;
+    stopWalk();
     document.body.style.overflow = "hidden";
     $("sheet").querySelector(".x").focus({ preventScroll: true });
   }
@@ -714,17 +867,17 @@ form.add .err { color: var(--danger); font-size: 0.9rem; }
     buildWorld();
     renderRail();
     refreshCardMeta();
+    paintClouds();
     layout();
-    let ticking = false;
-    window.addEventListener("scroll", () => {
-      if (ticking) return;
-      ticking = true;
-      requestAnimationFrame(() => { ticking = false; update(); });
-    }, { passive: true });
+    // one animation loop: scroll position drives the walk, time drives the drifting clouds
+    const frame = () => {
+      if (!document.hidden && window.scrollY < journeyTop() + $("journey").offsetHeight) update();
+      requestAnimationFrame(frame);
+    };
+    requestAnimationFrame(frame);
+    window.addEventListener("scroll", () => { if (!walking) setWalkLabel(); }, { passive: true });
     let rT;
     window.addEventListener("resize", () => { clearTimeout(rT); rT = setTimeout(layout, 120); });
-    matchMedia("(prefers-color-scheme: dark)").addEventListener("change", drawFloor);
-    new MutationObserver(drawFloor).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(update);
   }
 })();
